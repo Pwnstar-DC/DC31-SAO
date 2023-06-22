@@ -2,8 +2,6 @@
 #include "./display_drivers/ssd1306_128x32.hpp"
 #include "./display_drivers/ssd1306_parent.hpp"
 
-#include "images.h"
-
 int i = 1;
 int displayWidth = 0;
 int displayHeight = 0;
@@ -29,5 +27,8 @@ void loop() {
   delay(100);
   i += 1;
 
-  display->display.draw
+  // modules?
+  // register modules in array of modules
+  // ModuleBase[] = [mod1, mod2, ...]
+  // if we do modules, then menu? Buttons? Partition display? TBD
 }
