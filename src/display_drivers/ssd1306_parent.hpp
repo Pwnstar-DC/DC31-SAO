@@ -54,13 +54,6 @@ public:
         display->display();
     }
 
-    void drawVLine(int x, int y, int z)
-    {
-        display->drawVerticalLine(x, y, z);
-        display->display();
-    }
-
-
     int writeTextToScreen(String text, int locX, int locY) {
         return display->drawStringMaxWidth(locX, locY, getRelativeMaxWidth(), text );
     }
@@ -83,6 +76,10 @@ public:
 
     void scrollText(String text, int locX, int locY) {
         return;
+    }
+
+    void drawVLine(int locX, int locY, int len) {
+        display->drawVerticalLine(locX, locY, len);
     }
 };
 

@@ -11,10 +11,11 @@ class ModuleBase
 private:
     bool isActive = false;
     bool isSessionPersistent = false;
-    DisplayParent *activeDisplay;
 
     // public members
 public:
+
+    DisplayParent *activeDisplay;
 
     ModuleBase(DisplayParent *dispP) {
         activeDisplay = dispP;
@@ -22,10 +23,12 @@ public:
 
     virtual void setup() {};
     virtual void update() {};
-    virtual void teardown()  {}
-    virtual bool getIsSessionPersistent() {};
+    virtual void teardown() {}
+    virtual bool getIsSessionPersistent() {
+        return isSessionPersistent;
+    };
 
-    bool getIsActive() {
+    virtual bool getIsActive() {
         return isActive;
     }
 };

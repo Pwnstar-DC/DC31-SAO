@@ -1,8 +1,7 @@
 
 #include "./display_drivers/ssd1306_128x64.hpp"
 #include "./display_drivers/ssd1306_parent.hpp"
-//#include "sao_modules/frequency_analysis_display/freq_analysis.cpp"
-#include "sao_modules/frequency_analysis_display/freq_analysis.hpp"
+#include "./helpers/module_manager.hpp"
 
 int i = 1;
 int displayWidth = 0;
@@ -23,7 +22,8 @@ void setup() {
   displayWidth = display->getRelativeMaxWidth();
   displayHeight = display->getRelativeMaxHeight();
 
-  freq_setup(display);
+  
+
 }
 
 void loop() {
@@ -33,8 +33,5 @@ void loop() {
   delay(100);
   i += 1;
 
-  // modules?
-  // register modules in array of modules
-  // ModuleBase[] = [mod1, mod2, ...]
-  // if we do modules, then menu? Buttons? Partition display? TBD
+ 
 }
