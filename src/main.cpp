@@ -1,6 +1,8 @@
 
-#include "./display_drivers/ssd1306_128x32.hpp"
+#include "./display_drivers/ssd1306_128x64.hpp"
 #include "./display_drivers/ssd1306_parent.hpp"
+//#include "sao_modules/frequency_analysis_display/freq_analysis.cpp"
+#include "sao_modules/frequency_analysis_display/freq_analysis.hpp"
 
 int i = 1;
 int displayWidth = 0;
@@ -13,11 +15,15 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  display = new SSD1306_128x32;
+  Serial.println("Starting...");
+
+  display = new SSD1306_128x64;
 
   display->init();
   displayWidth = display->getRelativeMaxWidth();
   displayHeight = display->getRelativeMaxHeight();
+
+  freq_setup(display);
 }
 
 void loop() {

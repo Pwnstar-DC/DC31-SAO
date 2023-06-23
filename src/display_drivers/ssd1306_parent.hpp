@@ -1,4 +1,3 @@
-
 #ifndef SSD1306_PARENT_H
 #define SSD1306_PARENT_H
 
@@ -18,7 +17,7 @@ public:
     }
 
     virtual SSD1306Wire* getDisplay() {
-        return new SSD1306Wire(0x3c, SDA, SCL);
+        return new SSD1306Wire(0x3c, 5, 4);
     };
 
     void init() {
@@ -39,6 +38,28 @@ public:
         display->display();
         display->clear();
     }
+
+    void write_test(String text, int locX, int locY)
+    {
+        display->setLogBuffer(1, 30);
+        display->println(text);
+        display->drawLogBuffer(locX, locY);
+        display->display();
+        delay(500);
+        display->flush();
+    }
+
+    void display_current()
+    {
+        display->display();
+    }
+
+    void drawVLine(int x, int y, int z)
+    {
+        display->drawVerticalLine(x, y, z);
+        display->display();
+    }
+
 
     int writeTextToScreen(String text, int locX, int locY) {
         return display->drawStringMaxWidth(locX, locY, getRelativeMaxWidth(), text );
