@@ -18,11 +18,7 @@ public:
      }
 
     SSD1306Wire* getDisplay() {
-<<<<<<< HEAD
         return new SSD1306Wire(0x3c, 5, 4, GEOMETRY_128_64);
-=======
-        return new SSD1306Wire(0x3c, SDA, SCL, GEOMETRY_128_64);
->>>>>>> c525cdfcdbfe709e7b4f29fcff2ab3b38bdab804
     }
 };
 

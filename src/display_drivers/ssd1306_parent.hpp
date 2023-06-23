@@ -17,11 +17,7 @@ public:
     }
 
     virtual SSD1306Wire* getDisplay() {
-<<<<<<< HEAD
         return new SSD1306Wire(0x3c, 5, 4);
-=======
-        return new SSD1306Wire(0x3c, SDA, SCL);
->>>>>>> c525cdfcdbfe709e7b4f29fcff2ab3b38bdab804
     };
 
     void init() {
