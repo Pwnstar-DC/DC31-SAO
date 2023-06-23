@@ -15,6 +15,7 @@ private:
 public:
     FrequencyAnalysisDisplayModule(DisplayParent *display) : ModuleBase(display) {};
     void draw();
+
     void setup() {
 
         // Set WiFi to station mode and disconnect from an AP if it was previously connected
@@ -48,30 +49,30 @@ public:
                 activeDisplay->writeTextToScreen("No Networks Found", 0, 0);
                 activeDisplay->flush();
             } else {
-            String networks = String(num) + " Networks Found";
-            activeDisplay->writeTextToScreen(networks, 0, 0);
+                String networks = String(num) + " Networks Found";
+                activeDisplay->writeTextToScreen(networks, 0, 0);
 
-            for (int i = 0; i < num; ++i) {
+                for (int i = 0; i < num; ++i) {
 
-                Serial.println(WiFi.RSSI(i));
-                //display.println(")");
-                //display.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
-                data[i] = WiFi.RSSI(i);
-                //delay(10);
-            }
-
-            int j = 100;
-            for(int i=0; i < num; i++)
-            {
-                if(i=0)
-                {
-                    activeDisplay->writeTextToScreen(String(WiFi.RSSI(i)), 0, 30);
+                    Serial.println(WiFi.RSSI(i));
+                    //display.println(")");
+                    //display.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+                    data[i] = WiFi.RSSI(i);
+                    //delay(10);
                 }
-                activeDisplay->writeTextToScreen(String(WiFi.RSSI(i)), j, 30);
-                j += 100;
-            }
 
-            activeDisplay->flush();
+                int j = 100;
+                for(int i=0; i < num; i++)
+                {
+                    if(i=0)
+                    {
+                        activeDisplay->writeTextToScreen(String(WiFi.RSSI(i)), 0, 30);
+                    }
+                    activeDisplay->writeTextToScreen(String(WiFi.RSSI(i)), j, 30);
+                    j += 100;
+                }
+
+                activeDisplay->flush();
             }
         }
     }

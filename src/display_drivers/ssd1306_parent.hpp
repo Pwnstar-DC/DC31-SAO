@@ -17,7 +17,14 @@ public:
     }
 
     virtual SSD1306Wire* getDisplay() {
-        return new SSD1306Wire(0x3c, 5, 4);
+        #ifndef SCLPIN
+        #define SCLPIN SCL
+        #endif
+        #ifndef SDAPIN
+        #define SDAPIN SDA
+        #endif
+
+        return new SSD1306Wire(0x3c, int(SCLPIN), int(SDAPIN));
     };
 
     void init() {
