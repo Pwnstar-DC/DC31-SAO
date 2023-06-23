@@ -15,8 +15,8 @@ private:
 public:
     SSD1306_128x32() { }
 
-    SSD1306Wire getDisplay() {
-        return SSD1306Wire(0x3c, SDA, SCL, GEOMETRY_128_32);
+    SSD1306Wire* getDisplay() {
+        return new SSD1306Wire(0x3c, SDA, SCL, GEOMETRY_128_32);
     }
 };
 
