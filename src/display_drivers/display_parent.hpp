@@ -18,6 +18,7 @@ public:
     virtual void flush() {};
     virtual void flipScreenVertically() {};
     virtual void mirrorDisplay() {};
+    virtual void clear() {};
 };
 
 #endif

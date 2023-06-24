@@ -52,12 +52,15 @@ public:
     }
 
     SSD1306Wire* getDisplay() {
-        Serial.println("Using the following display configuration:");
-        Serial.println("Screen size: " + String(SCREEN_X) + "x" + String(SCREEN_Y));
-        Serial.println("Screen I2C Address: " + hexToString(DISP_IIC_ADDR));
-        Serial.println("I2C Com Pins: SDA: " + hexToString(SDAPIN) + ", SCL/SCK: " + hexToString(SCLPIN));
-        Serial.println();
-        Serial.flush();
+        if(SERIAL_ENABLE) {
+            Serial.println("Using the following display configuration:");
+            Serial.println("Screen size: " + String(SCREEN_X) + "x" + String(SCREEN_Y));
+            Serial.println("Screen I2C Address: " + hexToString(DISP_IIC_ADDR));
+            Serial.println("I2C Com Pins: SDA: " + hexToString(SDAPIN) + ", SCL/SCK: " + hexToString(SCLPIN));
+            Serial.println();
+            Serial.flush();
+        }
+        
         return new SSD1306Wire(DISP_IIC_ADDR, SDAPIN, SCLPIN , SCREEN_FMT);
     };
 
@@ -127,6 +130,11 @@ public:
 
     void drawVLine(int locX, int locY, int len) {
         display->drawVerticalLine(locX, locY, len);
+    }
+
+    void clear() {
+        display->clear();
+        display->display();
     }
 };
 

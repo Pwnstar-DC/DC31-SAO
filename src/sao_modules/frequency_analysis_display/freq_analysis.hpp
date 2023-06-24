@@ -49,7 +49,7 @@ public:
     {
         int num;
         num = WiFi.scanNetworks();
-        activeDisplay->flush();
+        activeDisplay->clear();
 
         // WiFi.scanNetworks will return the number of networks found
         //int num = WiFi.scanNetworks();

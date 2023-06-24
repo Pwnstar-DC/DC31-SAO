@@ -14,6 +14,9 @@ private:
     int currentActiveModule = -1;
 
     void writeToSerial(String s) {
+        if(!SERIAL_ENABLE) {
+            return;
+        }
         Serial.println("Module Manager: " + s);
     }
 
