@@ -48,7 +48,6 @@ void ModuleManager::deactivateModule(int index) {
 }
 
 void ModuleManager::triggerModuleUpdate() {
-    activeModule->update();
     activeModule->waitForSync();
 }
 

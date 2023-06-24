@@ -19,6 +19,12 @@ public:
     virtual void flipScreenVertically() {};
     virtual void mirrorDisplay() {};
     virtual void clear() {};
+    virtual uint8_t getFontOffsetCharHeight() {
+        return 0;
+    };
+
+    virtual void setDisplayOff() {};
+    virtual void setDisplayOn() {};
 };
 
 #endif

@@ -18,7 +18,6 @@ ModuleManager *mm;
 SSD1306 *display;
 
 void setup() {
-
   if(SERIAL_ENABLE){ 
     Serial.begin(115200);
     Serial.setTxTimeoutMs(0);
@@ -36,6 +35,7 @@ void setup() {
   display->flush();
   displayWidth = display->getRelativeMaxWidth();
   displayHeight = display->getRelativeMaxHeight();
+  display->writeTextToScreen("initialized", displayWidth/2, displayHeight/2);
   writeToSerial("Finished initializing display...");
   writeToSerial("Initializing Modules...");
   mm = new ModuleManager(display);
@@ -46,6 +46,7 @@ void setup() {
 
 void loop() {
   mm->triggerModuleUpdate();
+  delay(100);
 }
 
 void writeToSerial(String s) {

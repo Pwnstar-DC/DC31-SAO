@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include "OLEDDisplay.h" // for access to font functions
 
 class SSD1306 : public DisplayParent {
 
@@ -39,6 +40,8 @@ private:
     SSD1306Wire* display = 0;
     int DISPLAY_WIDTH_MAX = SCREEN_X;
     int DISPLAY_HEIGHT_MAX = SCREEN_Y;
+    int initialized = 0;
+    uint8_t *currentFont = (uint8_t *) ArialMT_Plain_10;
 
 public:
     String hexToString(int x) {
@@ -64,16 +67,29 @@ public:
         return new SSD1306Wire(DISP_IIC_ADDR, SDAPIN, SCLPIN , SCREEN_FMT);
     };
 
+    void setFont(uint8_t *f) {
+        display->setFont(f);
+    }
 
-  
     void init() {
+        if(initialized) {
+            return;
+        }
+        initialized = 1;
         display = getDisplay(); 
         display->init();
-        display->setFont(ArialMT_Plain_10);
+        setFont(currentFont);
         display->displayOn();
-
-        //display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getRelativeMaxWidth(), "initialized" );
+        display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getRelativeMaxWidth(), "initialized" );
         display->flush();
+    }
+
+    void setDisplayOn() {
+        display->displayOn();
+    }
+
+    void setDisplayOff() {
+        display->displayOff();
     }
 
     void flipScreenVertically() {
@@ -120,6 +136,10 @@ public:
         return display->getHeight();
     }
 
+    uint8_t getFontOffsetCharHeight() {
+        return pgm_read_byte(currentFont + HEIGHT_POS);
+    }
+
     int getRelativeWidthOfString(String s) {
         return display->getStringWidth(s);
     }
@@ -135,6 +155,7 @@ public:
     void clear() {
         display->clear();
         display->display();
+
     }
 };
 
