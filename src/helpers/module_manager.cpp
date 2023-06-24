@@ -2,13 +2,14 @@
 #define MODULE_MANAGER_C
 
 #include "module_manager.hpp"
+#include <vector>
 
-ModuleBase ** ModuleManager::getModules() {
+std::vector<ModuleBase *> ModuleManager::getModules() {
     return REGISTERED_MODULES;
 }
 
 int ModuleManager::getNumberOfModules() {
-    return nModules;
+    return REGISTERED_MODULES.size();
 }
 
 int ModuleManager::getCurrentActiveModule() {
@@ -20,7 +21,7 @@ ModuleBase* ModuleManager::getActiveModule() {
 }
 
 void ModuleManager::activateModule(int index) {
-    if(!(index >= 0 && index < nModules)) {
+    if(!(index >= 0 && index < REGISTERED_MODULES.size())) {
         return; // error case
     }
 
@@ -35,7 +36,7 @@ void ModuleManager::activateModule(int index) {
 }
 
 void ModuleManager::deactivateModule(int index) {
-    if(!(index >= 0 && index < nModules)) {
+    if(!(index >= 0 && index < REGISTERED_MODULES.size())) {
         return; // error case
     }
 
@@ -48,7 +49,7 @@ void ModuleManager::deactivateModule(int index) {
 
 void ModuleManager::triggerModuleUpdate() {
     activeModule->update();
+    activeModule->waitForSync();
 }
-
 
 #endif

@@ -4,24 +4,30 @@
 #include "../sao_modules/module_base.hpp"
 #include "../sao_modules/frequency_analysis_display/freq_analysis.hpp"
 #include "../display_drivers/display_parent.hpp"
+#include <vector>
 
 class ModuleManager {
 
 private:
-    int nModules = 0;
-    ModuleBase **REGISTERED_MODULES;
+    std::vector<ModuleBase *> REGISTERED_MODULES;
     ModuleBase *activeModule;
     int currentActiveModule = -1;
 
-public:
-    
-    ModuleManager(DisplayParent *dispP) {
-        *REGISTERED_MODULES = {
-            new FrequencyAnalysisDisplayModule(dispP)
-        };
+    void writeToSerial(String s) {
+        Serial.println("Module Manager: " + s);
     }
 
-    ModuleBase ** getModules();
+public:
+
+    ModuleManager(DisplayParent *dispP) {
+        writeToSerial("Registering modules...");
+        REGISTERED_MODULES.push_back(
+            new FrequencyAnalysisDisplayModule(dispP)
+        );
+        writeToSerial("Finished registering modules...");
+    }
+
+    std::vector<ModuleBase *> getModules();
 
     int getNumberOfModules();
 

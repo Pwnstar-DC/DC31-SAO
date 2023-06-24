@@ -3,30 +3,66 @@
 
 #include "SSD1306Wire.h" 
 #include "./display_parent.hpp"
+#include <iostream>
+#include <string>
+#include <sstream>
 
 class SSD1306 : public DisplayParent {
 
+#ifndef SCLPIN
+#define SCLPIN SCL
+#endif
+#ifndef SDAPIN
+#define SDAPIN SDA
+#endif
+#ifndef DISP_IIC_ADDR
+#define DISP_IIC_ADDR 0x3c
+#endif
+#ifndef SCREEN_X
+#define SCREEN_X 128
+#endif
+#ifndef SCREEN_Y
+#define SCREEN_Y 64
+#endif
+
+#if SCREEN_X == 128 && SCREEN_Y == 32
+#define SCREEN_FMT GEOMETRY_128_32
+#elif SCREEN_X == 64 && SCREEN_Y == 48
+#define SCREEN_FMT GEOMETRY_64_48
+#elif SCREEN_X == 64 && SCREEN_Y == 32
+#define SCREEN_FMT GEOMETRY_64_32
+#else
+#define SCREEN_FMT GEOMETRY_128_64
+#endif
+
 private:
     SSD1306Wire* display = 0;
-    int DISPLAY_WIDTH_MAX = 0;
-    int DISPLAY_HEIGHT_MAX = 0;
+    int DISPLAY_WIDTH_MAX = SCREEN_X;
+    int DISPLAY_HEIGHT_MAX = SCREEN_Y;
 
 public:
-    SSD1306() {
-        
+    String hexToString(int x) {
+        std::stringstream s;
+        s << "0x" << std::hex << x;
+        return String(s.str().c_str());
     }
 
-    virtual SSD1306Wire* getDisplay() {
-        #ifndef SCLPIN
-        #define SCLPIN SCL
-        #endif
-        #ifndef SDAPIN
-        #define SDAPIN SDA
-        #endif
+    SSD1306() {
+    
+    }
 
-        return new SSD1306Wire(0x3c, int(SCLPIN), int(SDAPIN));
+    SSD1306Wire* getDisplay() {
+        Serial.println("Using the following display configuration:");
+        Serial.println("Screen size: " + String(SCREEN_X) + "x" + String(SCREEN_Y));
+        Serial.println("Screen I2C Address: " + hexToString(DISP_IIC_ADDR));
+        Serial.println("I2C Com Pins: SDA: " + hexToString(SDAPIN) + ", SCL/SCK: " + hexToString(SCLPIN));
+        Serial.println();
+        Serial.flush();
+        return new SSD1306Wire(DISP_IIC_ADDR, SCLPIN, SDAPIN , SCREEN_FMT);
     };
 
+
+  
     void init() {
         display = getDisplay(); 
         display->init();

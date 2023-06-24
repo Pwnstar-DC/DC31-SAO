@@ -1,8 +1,7 @@
 
-#include "./display_drivers/ssd1306_128x64.hpp"
-#include "./display_drivers/ssd1306_128x32.hpp"
-#include "./display_drivers/ssd1306_parent.hpp"
+#include "./display_drivers/ssd1306.hpp"
 #include "./helpers/module_manager.hpp"
+#include "headers.hpp"
 
 int i = 1;
 int displayWidth = 0;
@@ -15,29 +14,29 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
+  delay(1000);
 
-  Serial.println("Starting...");
-
-  #ifndef SCREEN_SIZE
-  display = new SSD1306_128x64;
-  #elif SCREEN_SIZE == 32
-  display = new SSD1306_128x32;
-  #elif SCREEN_SIZE == 64
-  display = new SSD1306_128x64
-  #else
-  display = new SSD1306_128x64;
-  #endif
-
+  writeToSerial("Starting...");
+  writeToSerial("Initializing display...");
+  display = new SSD1306;
+  delay(500);
   display->init();
   displayWidth = display->getRelativeMaxWidth();
   displayHeight = display->getRelativeMaxHeight();
-
+  writeToSerial("Finished initializing display...");
+  writeToSerial("Initializing Modules...");
   mm = new ModuleManager(display);
+  delay(500);
+  writeToSerial("Activating first  module...");
   mm->activateModule(0);
+  writeToSerial("Setup complete");
 }
 
 void loop() {
-  
-  mm->getActiveModule()->update();
-  delay(100);
+  mm->triggerModuleUpdate();
+}
+
+void writeToSerial(String s) {
+  Serial.println(s);
+  Serial.flush();
 }

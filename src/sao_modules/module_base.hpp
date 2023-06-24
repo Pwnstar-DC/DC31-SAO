@@ -31,6 +31,10 @@ public:
     virtual bool getIsActive() {
         return isActive;
     }
+
+    virtual void waitForSync() {
+        delay(100);
+    }
 };
 
 
