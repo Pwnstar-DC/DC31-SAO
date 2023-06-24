@@ -14,7 +14,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
-  delay(1000);
+  //delay(1000);
 
   writeToSerial("Starting...");
   writeToSerial("Initializing display...");

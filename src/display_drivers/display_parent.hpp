@@ -6,6 +6,7 @@ class DisplayParent {
 
 public:
     virtual void init() {};
+    virtual void writeTest(String text, int locX, int locY){};
     virtual int writeTextToScreen(String text, int locX, int locY) {
         return 0;
     };

@@ -58,7 +58,7 @@ public:
         Serial.println("I2C Com Pins: SDA: " + hexToString(SDAPIN) + ", SCL/SCK: " + hexToString(SCLPIN));
         Serial.println();
         Serial.flush();
-        return new SSD1306Wire(DISP_IIC_ADDR, SCLPIN, SDAPIN , SCREEN_FMT);
+        return new SSD1306Wire(DISP_IIC_ADDR, SDAPIN, SCLPIN , SCREEN_FMT);
     };
 
 
@@ -69,7 +69,7 @@ public:
         display->setFont(ArialMT_Plain_10);
         display->displayOn();
 
-        display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getRelativeMaxWidth(), "initialized" );
+        //display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getRelativeMaxWidth(), "initialized" );
         display->flush();
     }
 
@@ -86,7 +86,7 @@ public:
         display->clear();
     }
 
-    void write_test(String text, int locX, int locY)
+    void writeTest(String text, int locX, int locY)
     {
         display->setLogBuffer(1, 30);
         display->println(text);

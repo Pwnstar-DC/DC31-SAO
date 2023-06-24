@@ -14,7 +14,19 @@ private:
 
 public:
     FrequencyAnalysisDisplayModule(DisplayParent *display) : ModuleBase(display) {};
-    void draw();
+    void draw()
+    {
+        int HighestPeak;
+        int Height;
+
+        //draw X axis notches:
+        for(byte x = 0; x < 128; x+=10)
+        {
+            //draw notches every 10 ticks to allow identifying the range of frequencies
+            //u8g2.drawVLine(x,62,2);
+            activeDisplay->drawVLine(x,62,2);
+        }
+    }
 
     void setup() {
 
@@ -24,8 +36,9 @@ public:
         delay(100);
 
         Serial.println("Setup done");
-        activeDisplay->writeTextToScreen("Scan Start", 0, 0);
+        activeDisplay->writeTest("Scan Start", 0, 0);
         activeDisplay->flush();
+        update();
     }
 
     void teardown() {
@@ -42,15 +55,17 @@ public:
         //int num = WiFi.scanNetworks();
 
         if (num == 0) {
-            activeDisplay->writeTextToScreen("No Networks Found", 0, 0);
+            activeDisplay->writeTest("No Networks Found", 0, 0);
             activeDisplay->flush();
         } else {
             String networks = String(num) + " Networks Found";
-            activeDisplay->writeTextToScreen(networks, 0, 0);
+            Serial.println(networks);
+            activeDisplay->writeTest(networks, 0, 0);
 
             for (int i = 0; i < num; ++i) {
 
                 Serial.println(WiFi.RSSI(i));
+                activeDisplay->writeTest(String(WiFi.RSSI(i)),0,0);
                 //display.println(")");
                 //display.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
                 data[i] = WiFi.RSSI(i);
@@ -62,12 +77,12 @@ public:
             {
                 if(i=0)
                 {
-                    activeDisplay->writeTextToScreen(String(WiFi.RSSI(i)), 0, 30);
+                    activeDisplay->writeTest(String(WiFi.RSSI(i)), 0, 30);
                 }
-                activeDisplay->writeTextToScreen(String(WiFi.RSSI(i)), j, 30);
+                activeDisplay->writeTest(String(WiFi.RSSI(i)), j, 30);
                 j += 100;
             }
-
+            draw();
             activeDisplay->flush();
         }
     }
