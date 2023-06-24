@@ -67,6 +67,10 @@ public:
         display = getDisplay(); 
         display->init();
         display->setFont(ArialMT_Plain_10);
+        display->displayOn();
+
+        display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getRelativeMaxWidth(), "initialized" );
+        display->flush();
     }
 
     void flipScreenVertically() {
