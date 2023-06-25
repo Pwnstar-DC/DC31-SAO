@@ -66,6 +66,8 @@ public:
         return activeDisplay->getFontOffsetCharHeight() + 2*lineSpaceOffset;
     }
 
+    virtual void cycleMode() { };
+
 };
 
 

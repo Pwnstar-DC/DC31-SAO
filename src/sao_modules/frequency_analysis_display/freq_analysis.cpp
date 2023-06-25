@@ -3,6 +3,7 @@
 
 #include "freq_analysis.hpp"
 #include <bits/stdc++.h>
+#include <OLEDDisplay.h>
 
 
 void FrequencyAnalysisDisplayModule::setup() {
@@ -54,7 +55,7 @@ void FrequencyAnalysisDisplayModule::logicUpdate() {
         activeDisplay->drawProgress(scanningText, i, 0, 0, dispWidth, fontHeight);
         activeDisplay->write();
         i += 1;
-        delay(55);
+        delay(42);
         if(i == 100) {
             i = 0;
         }
@@ -74,8 +75,9 @@ void FrequencyAnalysisDisplayModule::displayUpdate()
 
     int yOffset = 0;
     int dispWidth = activeDisplay->getRelativeMaxWidth();
+    int dispHeight = activeDisplay->getRelativeMaxHeight();
     int fontHeight = activeDisplay->getFontOffsetCharHeight();
-    activeDisplay->clear(0, 0, dispWidth, fontHeight); // clear the scanning text
+    activeDisplay->clearDisplayBuffer();
     activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, yOffset);
     yOffset += activeDisplay->getFontOffsetCharHeight();
 
@@ -171,8 +173,6 @@ void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset, int di
             String(wn->channel),
             String(wn->encType)
         );
-        // overwrite the current line
-        activeDisplay->clear(0, yOffset, dispWidth, fontHeight);
         activeDisplay->writeTextToScreen(String(buf), 0, yOffset, -1);
         yOffset += getYOffsetIncrement();
     }

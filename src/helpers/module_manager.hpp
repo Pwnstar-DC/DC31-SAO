@@ -44,6 +44,8 @@ public:
 
     void triggerModuleUpdate();
 
+    void cycleMode();
+
 };
 
 #endif

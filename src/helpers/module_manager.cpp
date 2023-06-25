@@ -50,4 +50,8 @@ void ModuleManager::triggerModuleUpdate() {
     activeModule->waitForSync();
 }
 
+void ModuleManager::cycleMode() {
+    activeModule->cycleMode();
+}
+
 #endif

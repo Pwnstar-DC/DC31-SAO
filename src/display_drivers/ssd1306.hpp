@@ -160,7 +160,6 @@ public:
     void clear() {
         display->clear();
         display->display();
-
     }
 
     void clear(int locX, int locY, int width, int height) {
@@ -169,6 +168,11 @@ public:
                 display->clearPixel(i, j);
             }
         }
+        display->display();
+    }
+
+    void clearDisplayBuffer() {
+        display->clear();
     }
 
     void drawProgress(u8_t prog, int locX, int locY, int width, int height) {
@@ -185,6 +189,18 @@ public:
         }
         writeTextToScreen(preText, locX, locY);
         drawProgress(prog, locX + textWidth, locY, progWidth, height);
+    }
+
+    void drawRect(int locX, int locY, int width, int height) {
+        display->drawRect(locX, locY, width, height);
+    }
+
+    int getColor() {
+        return display->getColor();
+    }
+
+    void setColor(int c) {
+        display->setColor((OLEDDISPLAY_COLOR)c);
     }
 
 };

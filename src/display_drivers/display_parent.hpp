@@ -13,6 +13,7 @@ public:
     virtual int writeTextToScreen(String text, int locX, int locY, int maxX) {
         return 0;
     };
+    virtual void drawRect(int locX, int locY, int width, int height);
     virtual void scrollText(String text, int locX, int locY) {};
     virtual void drawVLine(int locX, int locY, int len) {};
     // write is similar to flush but, instead, does not clear the
@@ -27,6 +28,7 @@ public:
     virtual void clear() {};
     // this implementation allows for clearing specific parts of the screen
     virtual void clear(int locX, int locY, int width, int height) {};
+    virtual void clearDisplayBuffer() {};
     virtual uint8_t getFontOffsetCharHeight() {
         return 0;
     };
@@ -37,6 +39,8 @@ public:
 
     virtual void setDisplayOff() {};
     virtual void setDisplayOn() {};
+    virtual int getColor() { return 0; };
+    virtual void setColor(int c) {};
 };
 
 #endif
