@@ -35,7 +35,7 @@ void setup() {
   display->flush();
   displayWidth = display->getRelativeMaxWidth();
   displayHeight = display->getRelativeMaxHeight();
-  display->writeTextToScreen("initialized", displayWidth/2, displayHeight/2);
+  display->writeTextToScreen("initializing...", displayWidth/2, displayHeight/2);
   writeToSerial("Finished initializing display...");
   writeToSerial("Initializing Modules...");
   mm = new ModuleManager(display);

@@ -15,6 +15,9 @@ public:
     };
     virtual void scrollText(String text, int locX, int locY) {};
     virtual void drawVLine(int locX, int locY, int len) {};
+    // write is similar to flush but, instead, does not clear the
+    // entire display when updated. This makes it useful for making
+    // selective modifications to the display and updating.
     virtual void write() {};
     virtual void flush() {};
     virtual void flipScreenVertically() {};
@@ -22,6 +25,8 @@ public:
     virtual void drawProgress(u8_t prog, int locX, int locY, int width, int height) {};
     virtual void drawProgress(String txt, u8_t prog, int locX, int locY, int width, int height) {};
     virtual void clear() {};
+    // this implementation allows for clearing specific parts of the screen
+    virtual void clear(int locX, int locY, int width, int height) {};
     virtual uint8_t getFontOffsetCharHeight() {
         return 0;
     };

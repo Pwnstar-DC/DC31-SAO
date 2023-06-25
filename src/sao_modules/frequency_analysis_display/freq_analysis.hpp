@@ -7,11 +7,35 @@
 #include "../../sao_modules/module_base.hpp"
 #include "../../display_drivers/display_parent.hpp"
 #include <cstring>
+#include <vector>
+
+class WifiNetwork {
+public:
+
+    WifiNetwork(
+        String _ssid,
+        wifi_auth_mode_t _encType,
+        int32_t _dbPower,
+        int32_t _channel
+    ){
+        ssid = _ssid;
+        if(ssid.equals("?")) {
+            ssid = "<hidden>";
+        }
+        encType = _encType;
+        dbPower = _dbPower;
+        channel = _channel;
+    }
+    String ssid;
+    wifi_auth_mode_t encType;
+    int32_t dbPower;
+    int32_t channel;
+};
 
 class FrequencyAnalysisDisplayModule : public ModuleBase {
 
 private:
-    uint32_t data[128];
+    std::vector<WifiNetwork *> netLineVector;
     uint32_t counter = 0;
     int availableNetworks = 0;
     enum Modes { names, sigGraph };
@@ -23,7 +47,7 @@ public:
 
     void setup();
 
-    void printNetworkInformation(int yOffset);
+    void printNetworkInformation(int yOffset, int dispWidth, int fontHeight);
 
     void teardown();
 

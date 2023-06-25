@@ -163,20 +163,30 @@ public:
 
     }
 
+    void clear(int locX, int locY, int width, int height) {
+        for(int i = locX; i < width; i++) {
+            for(int j = locY; j < height; j++) {
+                display->clearPixel(i, j);
+            }
+        }
+    }
+
     void drawProgress(u8_t prog, int locX, int locY, int width, int height) {
+        // clear the buffer where the dimensions overlap
         display->drawProgressBar(locX, locY, width, height, prog);
     }
 
-    void drawProgress(String preText, u8_t prog, int locX, int locY, int width, int height) {
+    void drawProgress(String preText, u8_t prog, int locX, int locY, int width, int height) { 
         int textWidth = display->getStringWidth(preText) + 1;
         int progWidth = width;
         if((width + textWidth) > display->getWidth()) {
             // subtract width from the progress bar to make space
-            progWidth = (width + textWidth) % display->getWidth();
+            progWidth = (width + textWidth) - display->getWidth();
         }
         writeTextToScreen(preText, locX, locY);
-        drawProgress(locX + textWidth, locY, width, height, progWidth);
+        drawProgress(prog, locX + textWidth, locY, progWidth, height);
     }
+
 };
 
 #endif

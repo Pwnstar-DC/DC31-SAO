@@ -19,6 +19,7 @@ private:
     int displayRefreshTime = 100;
     int logicRefreshTime = 10000;
     int lineSpaceOffset = 1;
+    bool logicUpdateSinceLastDisplayUpdate = false;
 
     // public members
 public:
@@ -37,6 +38,10 @@ public:
         return isSessionPersistent;
     };
 
+    bool getHasLogicUpdateSinceLastDisplayUpdate() {
+        return logicUpdateSinceLastDisplayUpdate;
+    }
+
     virtual bool getIsActive() {
         return isActive;
     }
@@ -48,10 +53,12 @@ public:
         if(now > (lastLogicRefresh + logicRefreshTime)) {
             logicUpdate();
             lastLogicRefresh = now;
+            logicUpdateSinceLastDisplayUpdate = true;
         }
         if(now > (lastDisplayRefresh + displayRefreshTime)) {
             displayUpdate();
             lastDisplayRefresh = now;
+            logicUpdateSinceLastDisplayUpdate = false;
         }
     }
 
