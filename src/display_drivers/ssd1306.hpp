@@ -67,10 +67,6 @@ public:
         return new SSD1306Wire(DISP_IIC_ADDR, SDAPIN, SCLPIN , SCREEN_FMT);
     };
 
-    void setFont(uint8_t *f) {
-        display->setFont(f);
-    }
-
     void init() {
         if(initialized) {
             return;
@@ -78,6 +74,7 @@ public:
         initialized = 1;
         display = getDisplay(); 
         display->init();
+        display->flipScreenVertically();
         setFont(currentFont);
         display->displayOn();
         display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getRelativeMaxWidth(), "initialized" );
@@ -105,6 +102,10 @@ public:
         display->clear();
     }
 
+    void setFont(uint8_t *f) {
+        display->setFont(f);
+    }
+
     void writeTest(String text, int locX, int locY)
     {
         display->setLogBuffer(1, 30);
@@ -115,7 +116,7 @@ public:
         display->flush();
     }
 
-    void display_current()
+    void write()
     {
         display->display();
     }
@@ -148,6 +149,10 @@ public:
         return;
     }
 
+    int getWidthOfText(String text) {
+        return display->getStringWidth(text);
+    }
+
     void drawVLine(int locX, int locY, int len) {
         display->drawVerticalLine(locX, locY, len);
     }
@@ -156,6 +161,21 @@ public:
         display->clear();
         display->display();
 
+    }
+
+    void drawProgress(u8_t prog, int locX, int locY, int width, int height) {
+        display->drawProgressBar(locX, locY, width, height, prog);
+    }
+
+    void drawProgress(String preText, u8_t prog, int locX, int locY, int width, int height) {
+        int textWidth = display->getStringWidth(preText) + 1;
+        int progWidth = width;
+        if((width + textWidth) > display->getWidth()) {
+            // subtract width from the progress bar to make space
+            progWidth = (width + textWidth) % display->getWidth();
+        }
+        writeTextToScreen(preText, locX, locY);
+        drawProgress(locX + textWidth, locY, width, height, progWidth);
     }
 };
 

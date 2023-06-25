@@ -3,7 +3,9 @@
 
 #include "../display_drivers/display_parent.hpp"
 #include <ctime>
+#include <chrono>
 
+using namespace std::chrono;
 class ModuleBase 
 {
     // class variables
@@ -12,10 +14,10 @@ class ModuleBase
 private:
     bool isActive = false;
     bool isSessionPersistent = false;
-    time_t lastDisplayRefresh = 0;
-    time_t lastLogicRefresh = 0;
-    int displayRefreshTime = 10000;
-    int logicRefreshTime = 100;
+    int64_t lastDisplayRefresh = 0;
+    int64_t lastLogicRefresh = 0;
+    int displayRefreshTime = 100;
+    int logicRefreshTime = 10000;
     int lineSpaceOffset = 1;
 
     // public members
@@ -40,15 +42,16 @@ public:
     }
 
     virtual void waitForSync() {
-        time_t t = std::time(nullptr);
 
-        if(t > (lastLogicRefresh + logicRefreshTime)) {
-            lastLogicRefresh = t;
+        int64_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+
+        if(now > (lastLogicRefresh + logicRefreshTime)) {
             logicUpdate();
+            lastLogicRefresh = now;
         }
-        if(t > (lastDisplayRefresh + displayRefreshTime)) {
-            lastDisplayRefresh = t;
+        if(now > (lastDisplayRefresh + displayRefreshTime)) {
             displayUpdate();
+            lastDisplayRefresh = now;
         }
     }
 

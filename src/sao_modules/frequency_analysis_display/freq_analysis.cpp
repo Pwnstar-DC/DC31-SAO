@@ -10,14 +10,11 @@ void FrequencyAnalysisDisplayModule::setup() {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     delay(100);
-
+    activeDisplay->clear();
     if(SERIAL_ENABLE) {
-        Serial.println("Setup done");
+        Serial.println("Frequency Module: Setup done");
     }
-    activeDisplay->writeTest("Scan Start", 0, 0);
     activeDisplay->flush();
-    logicUpdate();
-    displayUpdate();
 }
 
 void FrequencyAnalysisDisplayModule::teardown() {
@@ -38,34 +35,26 @@ void FrequencyAnalysisDisplayModule::draw()
     }
 }
 
- void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset) {
-    // print header
-    // networkName : type : sigStrength : channel
-    String fmtStringBase = "%s\t%s\t%s\t%s";
-    int bufSize = 512;
-    char buf[bufSize];
-    sprintf(buf, fmtStringBase.c_str(), "SSID", "Encryption", "Strength", "Channel");
-    activeDisplay->writeTextToScreen(buf, 0, yOffset);
-    yOffset += getYOffsetIncrement();
-    for(int i = 0; i < availableNetworks; i++) {
-        // clear buff
-        std::memset(buf, 0, bufSize);
-        // write line
-        sprintf(
-            buf, 
-            fmtStringBase.c_str(), 
-            WiFi.SSID(0),
-            WiFi.encryptionType(0),
-            WiFi.RSSI(0),
-            WiFi.channel(0)
-        );
-        activeDisplay->writeTextToScreen(buf, 0, yOffset);
-        yOffset += getYOffsetIncrement();
-    }
-}
-
 void FrequencyAnalysisDisplayModule::logicUpdate() {
-    availableNetworks = WiFi.scanNetworks();
+    WiFi.scanDelete();
+    WiFi.scanNetworks(true, true, 10000);
+    delay(10);
+
+    int i = 0;
+    String scanningText = "Scanning...";
+    int dispWidth = activeDisplay->getRelativeMaxWidth();
+    int widthOfScanText = activeDisplay->getWidthOfText(scanningText);
+    while(WiFi.scanComplete() == -1) {
+        activeDisplay->drawProgress(scanningText, i, 0, 0, dispWidth - widthOfScanText, activeDisplay->getFontOffsetCharHeight());
+        activeDisplay->flush();
+        i += 1;
+        delay(10);
+        if(i == 100) {
+            i = 0;
+        }
+    }
+    availableNetworks = WiFi.scanComplete();
+
     if(SERIAL_ENABLE) {
         Serial.println("Scanned networks; found: " + String(availableNetworks));
     }
@@ -75,10 +64,8 @@ void FrequencyAnalysisDisplayModule::displayUpdate()
 {        
     int yOffset = 0;
 
-    activeDisplay->clear();
     activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, yOffset);
-    activeDisplay->flush();
-    yOffset += getYOffsetIncrement();
+    yOffset += activeDisplay->getFontOffsetCharHeight();
 
     if(availableNetworks <= 0) {
         return;
@@ -94,6 +81,38 @@ void FrequencyAnalysisDisplayModule::displayUpdate()
         
     }
     activeDisplay->flush();
+    if(SERIAL_ENABLE) {
+        Serial.println("Wrote networks to display" + String(availableNetworks));
+    }
 }
+
+
+ void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset) {
+    // print header
+    // networkName : type : sigStrength : channel
+    String fmtStringBase = "%s :: %s :: %s :: %s";
+    int bufSize = 512;
+    char *buf = (char *) malloc(sizeof(char) * bufSize);
+    sprintf(buf, fmtStringBase.c_str(), "SSID", "Enc", "Pow", "Ch");
+    activeDisplay->writeTextToScreen(String(buf), 0, yOffset);
+    yOffset += getYOffsetIncrement();
+    for(int i = 0; i < availableNetworks; i++) {
+        // clear buff
+        std::memset(buf, 0, bufSize);
+        // write line
+        sprintf(
+            buf, 
+            fmtStringBase.c_str(), 
+            String(WiFi.SSID(i)),
+            String(WiFi.encryptionType(i)),
+            String(WiFi.RSSI(i)),
+            String(WiFi.channel(i))
+        );
+        activeDisplay->writeTextToScreen(String(buf), 0, yOffset);
+        yOffset += getYOffsetIncrement();
+    }
+    free(buf);
+}
+
 
 #endif
