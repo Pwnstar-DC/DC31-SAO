@@ -7,21 +7,20 @@
 
 
 void FrequencyAnalysisDisplayModule::setup() {
-
+    setDisplayRefreshTime(1500);
+    setLogicRefreshTime(15000);
     // Set WiFi to station mode and disconnect from an AP if it was previously connected
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     delay(100);
-    if(SERIAL_ENABLE) {
+    if(SERIAL_DEBUG) {
         Serial.println("Frequency Module: Setup done");
     }
     activeDisplay->flush();
 }
 
 void FrequencyAnalysisDisplayModule::teardown() {
-    for(int i = 0; i < netLineVector.size(); i++) {
-        free(netLineVector.at(i));
-    }
+    // netLineVector contains unique_ptrs, so no need to free
     return;
 }
 
@@ -37,6 +36,18 @@ void FrequencyAnalysisDisplayModule::draw()
         //u8g2.drawVLine(x,62,2);
         activeDisplay->drawVLine(x,62,2);
     }
+}
+
+void FrequencyAnalysisDisplayModule::displaySplashScreen() {
+    activeDisplay->clear();
+    activeDisplay->writeTextToScreen(
+        "2.4g wifi module",
+        (activeDisplay->getRelativeMaxWidth())/3,
+        (activeDisplay->getRelativeMaxHeight())/3,
+        activeDisplay->getRelativeMaxWidth()
+    );
+    activeDisplay->flush();
+    delay(2000);
 }
 
 void FrequencyAnalysisDisplayModule::logicUpdate() {
@@ -62,17 +73,13 @@ void FrequencyAnalysisDisplayModule::logicUpdate() {
     }
     availableNetworks = WiFi.scanComplete();
 
-    if(SERIAL_ENABLE) {
+    if(SERIAL_DEBUG) {
         Serial.println("Scanned networks; found: " + String(availableNetworks));
     }
 }
 
 void FrequencyAnalysisDisplayModule::displayUpdate()
 {        
-    if(!getHasLogicUpdateSinceLastDisplayUpdate()) {
-        return;
-    }
-
     int yOffset = 0;
     int dispWidth = activeDisplay->getRelativeMaxWidth();
     int dispHeight = activeDisplay->getRelativeMaxHeight();
@@ -85,98 +92,120 @@ void FrequencyAnalysisDisplayModule::displayUpdate()
         return;
     }
 
+    if(!getHasLogicUpdateSinceLastDisplayUpdate()) {
+        // if we hit this, we will just want to
+        // scroll the buffer of existing data rather
+        // than re-build all of it`
+        if(SERIAL_DEBUG) {
+            Serial.println("FA: Scrolling objects");
+        }
+        netLineVector.shiftForward();
+    }
+    else {
+        if(SERIAL_DEBUG) {
+            Serial.println("FA: Rebuilding objects");
+        }
+        buildNetworkInformation();
+    }
+
     switch(mode) {
         case names:
+            if(SERIAL_DEBUG) {
+                Serial.println("FA: refreshing data in names format");
+            }
             printNetworkInformation(yOffset, dispWidth, fontHeight);
             break;
         case sigGraph:
-
             break;
         
     }
     activeDisplay->write(); // writing here to allow for scan overlay with existing records
-    if(SERIAL_ENABLE) {
-        Serial.println("Wrote networks to display" + String(availableNetworks));
-    }
+   
 }
  
-bool wifiNetworkCompare(WifiNetwork *one, WifiNetwork *other) {
-    return one->dbPower > other->dbPower;
+bool wifiNetworkCompare(std::shared_ptr<WifiNetwork> one, std::shared_ptr<WifiNetwork> other) {
+    return one.get()->dbPower > other.get()->dbPower;
+}
+
+void FrequencyAnalysisDisplayModule::buildNetworkInformation() {
+    if(SERIAL_DEBUG) {
+        Serial.println("Clearing the old buffer of networks");
+        Serial.flush();
+    }
+
+    // This buffer is using unique pointers, so no need to free them before clearing
+    netLineVector.getBuffer().clear();
+
+    if(SERIAL_DEBUG) {
+        Serial.println("Building new buffer of networks");
+        Serial.flush();
+    }
+    // check that all discovered networks are tracked in the netLineVector
+    for(int i = 0; i < availableNetworks; i++) {
+        if(WiFi.BSSIDstr(i)) {
+                netLineVector.addToBuffer(
+                std::shared_ptr<WifiNetwork>(new WifiNetwork(
+                WiFi.BSSIDstr(i),
+                WiFi.SSID(i),
+                WiFi.encryptionType(i),
+                WiFi.RSSI(i),
+                WiFi.channel(i)
+            )));
+        }
+    }
+
+    if(SERIAL_DEBUG) {
+        Serial.println("FA: built a new list containing nNetworks: " + String(netLineVector.size()));
+        Serial.println("FA: sorting networks by signal strength");
+        Serial.flush();
+    }
+    // last step is to sort the vector so that the networks with the greatest
+    // signal strength bubble to the top
+    netLineVector.getBuffer().sort(wifiNetworkCompare);
 }
 
 void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset, int dispWidth, int fontHeight) {
-    // prep the network objects
-
-    // check that all discovered networks are tracked in the netLineVector
-    for(int i = 0; i < availableNetworks; i++) {
-        bool foundMatch = false;
-        // check if the wifi network exists in the vector already
-        for(int j = 0; j < netLineVector.size(); j++) {
-            if((*netLineVector.at(j)).ssid.equals(WiFi.SSID(i))) {
-                // this implies that we already have the ssid tracked
-                foundMatch = true;
-                break;
-            }
-        }
-        if(foundMatch) {
-            continue;
-        }
-        // if we don't have a match, we need to add it to the networks
-        netLineVector.push_back(new WifiNetwork(
-            WiFi.SSID(i),
-            WiFi.encryptionType(i),
-            WiFi.RSSI(i),
-            WiFi.channel(i)
-        ));
-    }
-
-    // now, we do the same thing but make sure that we dont have anyting
-    // leftover in the netLineVector that was not captured in the most recent scan
-    for(int i = 0; i < netLineVector.size(); i++) {
-        bool foundMatch = false;
-        for(int j = 0; j < availableNetworks; j++) {
-            if((*netLineVector.at(i)).ssid.equals(WiFi.SSID(j))) {
-                // this tells us we should continue to track this one
-                foundMatch = true;
-                break;
-            }
-        }
-        if(foundMatch) {
-            continue;
-        }
-        // in this case, we need to remove the network from the vector
-        // as this implies the network is now out of range
-        free(netLineVector.at(i));
-        netLineVector.erase(netLineVector.begin()+i);
-    }
-
-    // last step is to sort the vector so that the networks with the greatest
-    // signal strength bubble to the top
-    std::sort(netLineVector.begin(), netLineVector.end(), wifiNetworkCompare);
-
-    String fmtStringBase = "%s : %s : %s : %s";
+    String fmtStringBase = "%s : %s : %s";
     int bufSize = 512;
     char *buf = (char *) malloc(sizeof(char) * bufSize);
-    sprintf(buf, fmtStringBase.c_str(), "SSID", "POW", "CH", "ENC");
+    sprintf(buf, fmtStringBase.c_str(), "SSID", "POW", "CH");
     activeDisplay->writeTextToScreen(String(buf), 0, yOffset, 512);
     yOffset += getYOffsetIncrement();
 
-    for(const auto wn : netLineVector) {
+    if(SERIAL_DEBUG) {
+        Serial.println("FA-names: prepping to print objects");
+        Serial.flush();
+    }
+    std::shared_ptr<WifiNetwork> wn;
+    for(int i = 0; i < netLineVector.size(); i++) {
+        wn = netLineVector.at(i);
+        if(SERIAL_DEBUG) {
+            Serial.println("FA-Printing: " + wn->bssid);
+            Serial.flush();
+        }
         // clear buff
-        std::memset(buf, 0, bufSize);
+        std::memset(buf, '\0', bufSize);
         // write line
         sprintf(
             buf, 
             fmtStringBase.c_str(), 
             String(wn->ssid),
             String(wn->dbPower),
-            String(wn->channel),
-            String(wn->encType)
+            String(wn->channel)
+            // String(wn->encType)
         );
         activeDisplay->writeTextToScreen(String(buf), 0, yOffset, -1);
         yOffset += getYOffsetIncrement();
     }
+    if(SERIAL_DEBUG) {
+        Serial.println("FA-Done updating screen, freeing str buffer");
+        Serial.flush();
+    }
     free(buf);
+    if(SERIAL_DEBUG) {
+        Serial.println("FA-Freed buffer");
+        Serial.flush();
+    }
 }
 
 

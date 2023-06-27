@@ -16,9 +16,9 @@ private:
     bool isSessionPersistent = false;
     int64_t lastDisplayRefresh = 0;
     int64_t lastLogicRefresh = 0;
-    int displayRefreshTime = 100;
+    int displayRefreshTime = 250;
     int logicRefreshTime = 10000;
-    int lineSpaceOffset = 1;
+    int lineSpaceOffset = 0.5;
     bool logicUpdateSinceLastDisplayUpdate = false;
 
     // public members
@@ -37,6 +37,8 @@ public:
     virtual bool getIsSessionPersistent() {
         return isSessionPersistent;
     };
+
+    virtual void displaySplashScreen() { };
 
     bool getHasLogicUpdateSinceLastDisplayUpdate() {
         return logicUpdateSinceLastDisplayUpdate;
@@ -63,10 +65,22 @@ public:
     }
 
     virtual int getYOffsetIncrement() {
-        return activeDisplay->getFontOffsetCharHeight() + 2*lineSpaceOffset;
+        if(SERIAL_DEBUG) {
+            Serial.println("increment y offset");
+            Serial.flush();
+        }
+        return activeDisplay->getFontOffsetCharHeight() + lineSpaceOffset;
     }
 
     virtual void cycleMode() { };
+
+    virtual void setDisplayRefreshTime(int r) {
+        displayRefreshTime = r;
+    }
+
+    virtual void setLogicRefreshTime(int r) {
+        logicRefreshTime = r;
+    }
 
 };
 

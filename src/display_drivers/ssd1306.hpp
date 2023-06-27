@@ -55,7 +55,7 @@ public:
     }
 
     SSD1306Wire* getDisplay() {
-        if(SERIAL_ENABLE) {
+        if(SERIAL_DEBUG) {
             Serial.println("Using the following display configuration:");
             Serial.println("Screen size: " + String(SCREEN_X) + "x" + String(SCREEN_Y));
             Serial.println("Screen I2C Address: " + hexToString(DISP_IIC_ADDR));
@@ -122,7 +122,7 @@ public:
     }
 
     int writeTextToScreen(String text, int locX, int locY) {
-        return display->drawStringMaxWidth(locX, locY, getRelativeMaxWidth(), text );
+        return display->drawString(locX, locY, text );
     }
 
     int writeTextToScreen(String text, int locX, int locY, int maxW) {

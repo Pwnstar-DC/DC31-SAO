@@ -30,6 +30,8 @@ void ModuleManager::activateModule(int index) {
 
     ModuleBase * targetModule = REGISTERED_MODULES[index];    
     currentActiveModule = index;
+    
+    targetModule->displaySplashScreen();
     targetModule->setup();
     activeModule = targetModule;
 }

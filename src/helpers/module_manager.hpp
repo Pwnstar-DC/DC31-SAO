@@ -11,10 +11,11 @@ class ModuleManager {
 private:
     std::vector<ModuleBase *> REGISTERED_MODULES;
     ModuleBase *activeModule;
+    std::vector<DisplayParent *> displays;
     int currentActiveModule = -1;
 
     void writeToSerial(String s) {
-        if(!SERIAL_ENABLE) {
+        if(!SERIAL_DEBUG) {
             return;
         }
         Serial.println("Module Manager: " + s);
@@ -27,6 +28,7 @@ public:
         REGISTERED_MODULES.push_back(
             new FrequencyAnalysisDisplayModule(dispP)
         );
+        displays.push_back(dispP);
         writeToSerial("Finished registering modules...");
     }
 

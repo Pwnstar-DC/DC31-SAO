@@ -4,8 +4,8 @@
 #include "headers.hpp"
 
 
-#ifndef SERIAL_ENABLE
-#define SERIAL_ENABLE 0
+#ifndef SERIAL_DEBUG
+#define SERIAL_DEBUG 0
 #endif
 
 
@@ -18,7 +18,7 @@ ModuleManager *mm;
 SSD1306 *display;
 
 void setup() {
-  if(SERIAL_ENABLE){ 
+  if(SERIAL_DEBUG){ 
     Serial.begin(115200);
     Serial.setTxTimeoutMs(0);
     while (!Serial) {;}
@@ -50,7 +50,7 @@ void loop() {
 }
 
 void writeToSerial(String s) {
-  if(!SERIAL_ENABLE) {
+  if(!SERIAL_DEBUG) {
     return;
   }
   Serial.println(s);
