@@ -77,7 +77,7 @@ public:
         display->flipScreenVertically();
         setFont(currentFont);
         display->displayOn();
-        display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getRelativeMaxWidth(), "initialized" );
+        display->drawStringMaxWidth(DISPLAY_WIDTH_MAX/2, DISPLAY_HEIGHT_MAX/2, getWidth(), "initialized" );
         display->flush();
     }
 
@@ -129,11 +129,11 @@ public:
         return display->drawStringMaxWidth(locX, locY, maxW, text);
     }
 
-    int getRelativeMaxWidth() {
+    int getWidth() {
         return display->getWidth();
     }
 
-    int getRelativeMaxHeight() {
+    int getHeight() {
         return display->getHeight();
     }
 
@@ -175,12 +175,12 @@ public:
         display->clear();
     }
 
-    void drawProgress(u8_t prog, int locX, int locY, int width, int height) {
+    void drawProgress(uint8_t prog, int locX, int locY, int width, int height) {
         // clear the buffer where the dimensions overlap
         display->drawProgressBar(locX, locY, width, height, prog);
     }
 
-    void drawProgress(String preText, u8_t prog, int locX, int locY, int width, int height) { 
+    void drawProgress(String preText, uint8_t prog, int locX, int locY, int width, int height) { 
         int textWidth = display->getStringWidth(preText) + 1;
         int progWidth = width;
         if((width + textWidth) > display->getWidth()) {

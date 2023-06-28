@@ -4,15 +4,15 @@
 #include "../sao_modules/module_base.hpp"
 #include "../sao_modules/frequency_analysis_display/freq_analysis.hpp"
 #include "../display_drivers/display_parent.hpp"
+#include "../sao_modules/snake_module/headers.hpp"
 #include <vector>
 
 class ModuleManager {
 
 private:
     std::vector<ModuleBase *> REGISTERED_MODULES;
-    ModuleBase *activeModule;
+    ModuleBase *activeModule = NULL;
     std::vector<DisplayParent *> displays;
-    int currentActiveModule = -1;
 
     void writeToSerial(String s) {
         if(!SERIAL_DEBUG) {
@@ -26,7 +26,10 @@ public:
     ModuleManager(DisplayParent *dispP) {
         writeToSerial("Registering modules...");
         REGISTERED_MODULES.push_back(
-            new FrequencyAnalysisDisplayModule(dispP)
+            new FrequencyAnalysisDisplayModule(dispP, "frequency_module")
+        );
+        REGISTERED_MODULES.push_back(
+            new SnakeModule(dispP, "snake_module")
         );
         displays.push_back(dispP);
         writeToSerial("Finished registering modules...");
@@ -36,17 +39,19 @@ public:
 
     int getNumberOfModules();
 
-    int getCurrentActiveModule();
-
     ModuleBase * getActiveModule();
 
     void activateModule(int index);
+
+    void activateModule(ModuleBase * mod);
 
     void deactivateModule(int index);
 
     void triggerModuleUpdate();
 
     void cycleMode();
+
+    ModuleBase * getModuleByName(String name);
 
 };
 

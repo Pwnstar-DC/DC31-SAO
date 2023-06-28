@@ -23,8 +23,8 @@ public:
     virtual void flush() {};
     virtual void flipScreenVertically() {};
     virtual void mirrorDisplay() {};
-    virtual void drawProgress(u8_t prog, int locX, int locY, int width, int height) {};
-    virtual void drawProgress(String txt, u8_t prog, int locX, int locY, int width, int height) {};
+    virtual void drawProgress(uint8_t prog, int locX, int locY, int width, int height) {};
+    virtual void drawProgress(String txt, uint8_t prog, int locX, int locY, int width, int height) {};
     virtual void clear() {};
     // this implementation allows for clearing specific parts of the screen
     virtual void clear(int locX, int locY, int width, int height) {};
@@ -32,8 +32,8 @@ public:
     virtual uint8_t getFontOffsetCharHeight() {
         return 0;
     };
-    virtual int getRelativeMaxWidth() { return 0; };
-    virtual int getRelativeMaxHeight() { return 0; };
+    virtual int getWidth() { return 0; };
+    virtual int getHeight() { return 0; };
     virtual int getWidthOfText(String s) { return 0; };
     virtual void setFont(uint8_t *f) {};
 

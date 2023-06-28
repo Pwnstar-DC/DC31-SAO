@@ -20,14 +20,16 @@ private:
     int logicRefreshTime = 10000;
     int lineSpaceOffset = 0.5;
     bool logicUpdateSinceLastDisplayUpdate = false;
+    String moduleName = "";
 
     // public members
 public:
 
     DisplayParent *activeDisplay;
 
-    ModuleBase(DisplayParent *dispP) {
+    ModuleBase(DisplayParent *dispP, String _moduleName) {
         activeDisplay = dispP;
+        moduleName = _moduleName;
     }
 
     virtual void setup() {};
@@ -80,6 +82,10 @@ public:
 
     virtual void setLogicRefreshTime(int r) {
         logicRefreshTime = r;
+    }
+
+    virtual String getName() {
+        return moduleName;
     }
 
 };

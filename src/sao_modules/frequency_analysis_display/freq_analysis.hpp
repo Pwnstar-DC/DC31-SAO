@@ -9,6 +9,8 @@
 #include <cstring>
 #include <vector>
 #include "../../helpers/scrolling_buffer.hpp"
+#include <bits/stdc++.h>
+#include <OLEDDisplay.h>
 
 class WifiNetwork {
 public:
@@ -56,7 +58,8 @@ private:
     Modes mode = names;
 
 public:
-    FrequencyAnalysisDisplayModule(DisplayParent *display) : ModuleBase(display) {};
+    FrequencyAnalysisDisplayModule(DisplayParent *display, String name) : ModuleBase(display, name) {};
+    
     void draw();
 
     void setup();

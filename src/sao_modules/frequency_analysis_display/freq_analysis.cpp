@@ -2,9 +2,6 @@
 #define FREQ_ANALYSIS_C
 
 #include "freq_analysis.hpp"
-#include <bits/stdc++.h>
-#include <OLEDDisplay.h>
-
 
 void FrequencyAnalysisDisplayModule::setup() {
     setDisplayRefreshTime(1500);
@@ -42,9 +39,9 @@ void FrequencyAnalysisDisplayModule::displaySplashScreen() {
     activeDisplay->clear();
     activeDisplay->writeTextToScreen(
         "2.4g wifi module",
-        (activeDisplay->getRelativeMaxWidth())/3,
-        (activeDisplay->getRelativeMaxHeight())/3,
-        activeDisplay->getRelativeMaxWidth()
+        (activeDisplay->getWidth())/3,
+        (activeDisplay->getHeight())/3,
+        activeDisplay->getWidth()
     );
     activeDisplay->flush();
     delay(2000);
@@ -57,7 +54,7 @@ void FrequencyAnalysisDisplayModule::logicUpdate() {
     int i = 0;
     // clear the area specifically around the scanning text, not entire screen
     String scanningText = "Scanning...";
-    int dispWidth = activeDisplay->getRelativeMaxWidth();
+    int dispWidth = activeDisplay->getWidth();
     int widthOfScanText = activeDisplay->getWidthOfText(scanningText);
     int fontHeight = activeDisplay->getFontOffsetCharHeight();
     activeDisplay->clear(0, 0, dispWidth, fontHeight);
@@ -81,8 +78,8 @@ void FrequencyAnalysisDisplayModule::logicUpdate() {
 void FrequencyAnalysisDisplayModule::displayUpdate()
 {        
     int yOffset = 0;
-    int dispWidth = activeDisplay->getRelativeMaxWidth();
-    int dispHeight = activeDisplay->getRelativeMaxHeight();
+    int dispWidth = activeDisplay->getWidth();
+    int dispHeight = activeDisplay->getHeight();
     int fontHeight = activeDisplay->getFontOffsetCharHeight();
     activeDisplay->clearDisplayBuffer();
     activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, yOffset);

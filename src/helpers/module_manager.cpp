@@ -12,10 +12,6 @@ int ModuleManager::getNumberOfModules() {
     return REGISTERED_MODULES.size();
 }
 
-int ModuleManager::getCurrentActiveModule() {
-    return currentActiveModule;
-}
-
 ModuleBase* ModuleManager::getActiveModule() {
     return activeModule;
 }
@@ -24,16 +20,15 @@ void ModuleManager::activateModule(int index) {
     if(!(index >= 0 && index < REGISTERED_MODULES.size())) {
         return; // error case
     }
-        if(index == currentActiveModule) {
-        return;
-    }
 
     ModuleBase * targetModule = REGISTERED_MODULES[index];    
-    currentActiveModule = index;
-    
-    targetModule->displaySplashScreen();
-    targetModule->setup();
-    activeModule = targetModule;
+    activateModule(targetModule);
+}
+
+void ModuleManager::activateModule(ModuleBase * mod) {
+    mod->displaySplashScreen();
+    mod->setup();
+    activeModule = mod;
 }
 
 void ModuleManager::deactivateModule(int index) {
@@ -49,11 +44,22 @@ void ModuleManager::deactivateModule(int index) {
 }
 
 void ModuleManager::triggerModuleUpdate() {
-    activeModule->waitForSync();
+    if(activeModule) {
+        activeModule->waitForSync();
+    }
 }
 
 void ModuleManager::cycleMode() {
     activeModule->cycleMode();
+}
+
+ModuleBase * ModuleManager::getModuleByName(String name) {
+    for(const auto& mod : REGISTERED_MODULES) {
+        if(mod->getName().equals(name)) {
+            return mod;
+        }
+    }
+    return NULL;
 }
 
 #endif

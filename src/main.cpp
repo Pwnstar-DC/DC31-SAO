@@ -33,14 +33,23 @@ void setup() {
   display = new SSD1306;
   display->init();
   display->flush();
-  displayWidth = display->getRelativeMaxWidth();
-  displayHeight = display->getRelativeMaxHeight();
+  displayWidth = display->getWidth();
+  displayHeight = display->getHeight();
   display->writeTextToScreen("initializing...", displayWidth/2, displayHeight/2);
   writeToSerial("Finished initializing display...");
   writeToSerial("Initializing Modules...");
   mm = new ModuleManager(display);
-  writeToSerial("Activating first  module...");
-  mm->activateModule(0);
+  writeToSerial("Activating initial module...");
+  String initialModuleName = "frequency_module";
+  ModuleBase *mod = mm->getModuleByName(initialModuleName);
+  if(mod) {
+    mm->activateModule(mod);
+  }
+  else {
+      display->clear();
+      display->writeTextToScreen("Failed to find module: \n" + initialModuleName, 0, 0);
+      display->flush();
+  }
   writeToSerial("Setup complete");
 }
 
