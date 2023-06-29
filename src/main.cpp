@@ -20,7 +20,7 @@ SSD1306 *display;
 void setup() {
   if(SERIAL_DEBUG){ 
     Serial.begin(115200);
-    Serial.setTxTimeoutMs(0);
+    //Serial.setTxTimeoutMs(0);
     while (!Serial) {;}
     Serial.setTxBufferSize(5000);
     Serial.println();
@@ -40,7 +40,7 @@ void setup() {
   writeToSerial("Initializing Modules...");
   mm = new ModuleManager(display);
   writeToSerial("Activating initial module...");
-  String initialModuleName = "frequency_module";
+  String initialModuleName = "ble_server_module";
   ModuleBase *mod = mm->getModuleByName(initialModuleName);
   if(mod) {
     mm->activateModule(mod);
