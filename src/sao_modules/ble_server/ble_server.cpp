@@ -76,15 +76,18 @@ void BLEServerModule::setup()
 	BLEAdvertising *pAdvertising = pServer->getAdvertising();
 	pAdvertising->start();
 
-
+  String compare;
+  String valtostring;
+  
   while(1)
   {
-    String valtostring = pCharacteristic->getValue().c_str();
-    if(valtostring != "Hello World")
+    valtostring = pCharacteristic->getValue().c_str();
+    if(compare != valtostring)
     {
       Serial.println("Characteristic Written");
       writeCharacteristic(pCharacteristic);
     }
+    compare = valtostring;
   }
 
 }
