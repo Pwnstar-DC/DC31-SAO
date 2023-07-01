@@ -88,6 +88,12 @@ public:
         return moduleName;
     }
 
+    void deactivate() {
+        if(!isSessionPersistent) {
+            teardown();
+        }
+    }
+
 };
 
 

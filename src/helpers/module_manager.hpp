@@ -5,6 +5,7 @@
 #include "../sao_modules/frequency_analysis_display/freq_analysis.hpp"
 #include "../display_drivers/display_parent.hpp"
 #include "../sao_modules/snake_module/headers.hpp"
+#include "../sao_modules/ble_server/ble_server.hpp"
 #include <vector>
 
 class ModuleManager {
@@ -29,7 +30,10 @@ public:
             new FrequencyAnalysisDisplayModule(dispP, "frequency_module")
         );
         REGISTERED_MODULES.push_back(
-            new SnakeModule(dispP, "snake_module")
+           new SnakeModule(dispP, "snake_module")
+        );
+        REGISTERED_MODULES.push_back(
+            new BLEServerModule(dispP, "ble_server_module")
         );
         displays.push_back(dispP);
         writeToSerial("Finished registering modules...");
@@ -53,6 +57,7 @@ public:
 
     ModuleBase * getModuleByName(String name);
 
+    void nextModule(); // deactivate current module and activate the next one
 };
 
 #endif

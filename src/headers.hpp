@@ -9,4 +9,6 @@ void activeModuleCycleModes();
 
 void registerPinActions();
 
+void moduleCycle();
+
 #endif 

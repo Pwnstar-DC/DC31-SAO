@@ -68,6 +68,20 @@ void writeToSerial(String s) {
   Serial.flush();
 }
 
+void registerPinActions() {
+
+  #ifdef BOARD
+    #if BOARD == seed_xiao_esp32c3
+      // module mode cycle pin
+      pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
+      attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, CHANGE);
+      // rotate module pin
+      pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
+      attachInterrupt(digitalPinToInterrupt(D8), moduleCycle, CHANGE);
+    #endif
+  #endif
+}
+
 void activeModuleCycleModes() {
   #ifdef BOARD
     #if BOARD == seed_xiao_esp32c3
@@ -86,13 +100,21 @@ void activeModuleCycleModes() {
   mm->getActiveModule()->cycleMode();
 }
 
-void registerPinActions() {
-
+void moduleCycle() {
   #ifdef BOARD
     #if BOARD == seed_xiao_esp32c3
-      // mode cycle pin
-      pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, CHANGE);
+      // check that the D8 pin is currently HIGH, indicating that a
+      // state change was triggered (button pressed) and the original
+      // state was restored (button released)
+      if(digitalRead(D8) != HIGH) {
+        return;
+      }
+    #else
+      return;  
     #endif
+  #else
+    return;
   #endif
+  mm->nextModule();
 }
+

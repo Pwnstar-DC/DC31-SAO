@@ -62,4 +62,41 @@ ModuleBase * ModuleManager::getModuleByName(String name) {
     return NULL;
 }
 
+void ModuleManager::nextModule() {
+    // no reason to leave if only one module exists
+    if(REGISTERED_MODULES.size() <= 1) {
+        return;
+    }
+
+    // deactivate current module
+    if(activeModule) {
+        activeModule->deactivate();
+        if(activeModule->activeDisplay) {
+            activeModule->activeDisplay->flush();
+        }
+    }
+
+    // get the next module logically from the list of modules
+    bool foundCurrentModule = false;
+    ModuleBase * nextModule = NULL;
+    for(const auto& m : REGISTERED_MODULES) {
+        if(foundCurrentModule) {
+            // this is the next module to activate
+            nextModule = m;
+            break;
+        }
+        if(m == activeModule) {
+            foundCurrentModule = true;
+        }
+    }
+    if(nextModule) {
+        activateModule(nextModule);
+    }
+    else{
+        // this means that likely the active module was the last in the
+        // list. In this case, just get the first one and activate it
+        activateModule(REGISTERED_MODULES.at(0));
+    }
+}
+
 #endif
