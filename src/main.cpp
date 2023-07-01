@@ -18,16 +18,15 @@ ModuleManager *mm;
 SSD1306 *display;
 
 void setup() {
+  Serial.setTxTimeoutMs(0);
+  Serial.setTxBufferSize(5000);
   if(SERIAL_DEBUG){ 
     Serial.begin(115200);
-    Serial.setTxTimeoutMs(0);
     while (!Serial) {;}
-    Serial.setTxBufferSize(5000);
     Serial.println();
     Serial.println();
   }
  
-
   writeToSerial("Starting...");
   writeToSerial("Initializing display...");
   display = new SSD1306;
@@ -37,10 +36,13 @@ void setup() {
   displayHeight = display->getHeight();
   display->writeTextToScreen("initializing...", displayWidth/2, displayHeight/2);
   writeToSerial("Finished initializing display...");
+  writeToSerial("Initializing pins...");
+  registerPinActions();
+  writeToSerial("Finished initializing pins...");
   writeToSerial("Initializing Modules...");
   mm = new ModuleManager(display);
   writeToSerial("Activating initial module...");
-  String initialModuleName = "frequency_module";
+  String initialModuleName = "snake_module";
   ModuleBase *mod = mm->getModuleByName(initialModuleName);
   if(mod) {
     mm->activateModule(mod);
@@ -51,11 +53,11 @@ void setup() {
       display->flush();
   }
   writeToSerial("Setup complete");
+
 }
 
 void loop() {
   mm->triggerModuleUpdate();
-  delay(100);
 }
 
 void writeToSerial(String s) {
@@ -64,4 +66,33 @@ void writeToSerial(String s) {
   }
   Serial.println(s);
   Serial.flush();
+}
+
+void activeModuleCycleModes() {
+  #ifdef BOARD
+    #if BOARD == seed_xiao_esp32c3
+      // check that the D7 pin is currently HIGH, indicating that a
+      // state change was triggered (button pressed) and the original
+      // state was restored (button released)
+      if(digitalRead(D7) != HIGH) {
+        return;
+      }
+    #else
+      return;  
+    #endif
+  #else
+    return;
+  #endif
+  mm->getActiveModule()->cycleMode();
+}
+
+void registerPinActions() {
+
+  #ifdef BOARD
+    #if BOARD == seed_xiao_esp32c3
+      // mode cycle pin
+      pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
+      attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, CHANGE);
+    #endif
+  #endif
 }

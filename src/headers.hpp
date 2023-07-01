@@ -5,4 +5,8 @@
 
 void writeToSerial(String s);
 
+void activeModuleCycleModes();
+
+void registerPinActions();
+
 #endif 
