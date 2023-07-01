@@ -6,8 +6,6 @@
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-SSD1306 *bleDisplay;
-
 void BLEServerModule::printBuffer() {
   const char* test[] = {
     "Hack",
@@ -15,7 +13,6 @@ void BLEServerModule::printBuffer() {
     "Planet"};
 
     for (uint8_t i = 0; i < 11; i++) {
-      activeDisplay->flush();
       // Print to the screen
       //activeDisplay->writeTest("It Worked!", 0, 0);
       // Draw it to the internal screen buffer
@@ -50,46 +47,58 @@ void BLEServerModule::writeCharacteristic(BLECharacteristic *pCharacteristic)
   }
 }
 
+void BLEServerModule::displaySplashScreen() {
+  activeDisplay->clear();
+  activeDisplay->writeTextToScreen("BLE Module", 0, 20);
+  activeDisplay->flush();
+}
+
 void BLEServerModule::setup()
 {
+
+  setLogicRefreshTime(100);
+  setDisplayRefreshTime(200);
   
   activeDisplay->flush();
 
   Serial.println("Reached BLE Setup");
-
   BLEDevice::init("ESP32-BLE-Server");
-  BLEServer *pServer = BLEDevice::createServer();
+  pServer = BLEDevice::createServer();
 
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  pService = pServer->createService(SERVICE_UUID);
 
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+   pCharacteristic = pService->createCharacteristic(
     CHARACTERISTIC_UUID,
     BLECharacteristic::PROPERTY_READ |
     BLECharacteristic::PROPERTY_WRITE
   );
 
-  //pCharacteristic->setCallbacks(new MyCallbacks());
-
   pCharacteristic->setValue("Hello World");
   pService->start();
 
-	BLEAdvertising *pAdvertising = pServer->getAdvertising();
+	pAdvertising = pServer->getAdvertising();
 	pAdvertising->start();
+}
 
+void BLEServerModule::teardown() {
+  pService->stop();
+  pAdvertising->stop();
+}
+
+void BLEServerModule::logicUpdate() {
   String compare;
   String valtostring;
-  
-  while(1)
-  {
-    valtostring = pCharacteristic->getValue().c_str();
+  valtostring = pCharacteristic->getValue().c_str();
     if(compare != valtostring)
     {
       Serial.println("Characteristic Written");
       writeCharacteristic(pCharacteristic);
     }
     compare = valtostring;
-  }
+}
 
+void BLEServerModule::displayUpdate() {
+  activeDisplay->flush();
 }
 
 #endif

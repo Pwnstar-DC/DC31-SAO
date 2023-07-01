@@ -9,6 +9,11 @@
 class BLEServerModule : public ModuleBase {
 
 public:
+    BLECharacteristic *pCharacteristic;
+    BLEServer *pServer;
+    BLEService *pService;
+    BLEAdvertising *pAdvertising;
+
     BLEServerModule(DisplayParent *display, String name) : ModuleBase(display, name) {};
 
     void setup();
@@ -17,4 +22,8 @@ public:
 
     void writeCharacteristic(BLECharacteristic *pCharacteristic);
 
+    void logicUpdate();
+    void displayUpdate();
+    void teardown();
+    void displaySplashScreen();
 };

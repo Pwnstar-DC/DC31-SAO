@@ -58,37 +58,21 @@ void SnakeModule::logicUpdate()  {
         // there will never be a case where an xVector will be set at the same time as a yVector4
         // (at least for now)
         if(bl->locX >= activeDisplay->getWidth()) {
-            if(SERIAL_DEBUG) {
-                Serial.println("block off right edge");
-                Serial.flush();
-            }
             bl->locX -= bl->dimensions;
             bl->xVector = 0;
             bl->yVector = 1;
         }
         else if(bl->locX <= 0) {
-             if(SERIAL_DEBUG) {
-                Serial.println("block off left edge");
-                Serial.flush();
-            }
             bl->locX += bl->dimensions;
             bl->xVector = 0;
             bl->yVector = -1;
         }
         else if(bl->locY >= activeDisplay->getHeight()) {
-             if(SERIAL_DEBUG) {
-                Serial.println("block off bottom edge");
-                Serial.flush();
-            }
             bl->locY -= bl->dimensions;
             bl->yVector = 0;
             bl->xVector = -1;
         }
         else if(bl->locY <= 0) {
-             if(SERIAL_DEBUG) {
-                Serial.println("block off top edge");
-                Serial.flush();
-            }
             bl->locY += bl->dimensions;
             bl->yVector = 0;
             bl->xVector = 1;

@@ -14,6 +14,7 @@ class ModuleBase
 private:
     bool isActive = false;
     bool isSessionPersistent = false;
+    bool previouslyActive = false;
     int64_t lastDisplayRefresh = 0;
     int64_t lastLogicRefresh = 0;
     int displayRefreshTime = 250;

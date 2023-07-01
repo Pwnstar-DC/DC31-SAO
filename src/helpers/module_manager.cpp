@@ -67,7 +67,7 @@ void ModuleManager::nextModule() {
     if(REGISTERED_MODULES.size() <= 1) {
         return;
     }
-
+    
     // deactivate current module
     if(activeModule) {
         activeModule->deactivate();
@@ -85,16 +85,15 @@ void ModuleManager::nextModule() {
             nextModule = m;
             break;
         }
-        if(m == activeModule) {
+        if(m->getName().equals(activeModule->getName())) {
             foundCurrentModule = true;
         }
     }
+
     if(nextModule) {
         activateModule(nextModule);
     }
     else{
-        // this means that likely the active module was the last in the
-        // list. In this case, just get the first one and activate it
         activateModule(REGISTERED_MODULES.at(0));
     }
 }

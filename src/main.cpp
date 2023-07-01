@@ -13,6 +13,10 @@ int i = 1;
 int displayWidth = 0;
 int displayHeight = 0;
 
+bool shiftModules = false;
+bool shiftModes = false;
+
+
 ModuleManager *mm;
 
 SSD1306 *display;
@@ -57,6 +61,16 @@ void setup() {
 }
 
 void loop() {
+
+  if(shiftModes) {
+    mm->getActiveModule()->cycleMode();
+    shiftModes = false;
+  }
+  if(shiftModules) {
+    mm->nextModule();
+    shiftModules = false;
+  }
+
   mm->triggerModuleUpdate();
 }
 
@@ -68,53 +82,28 @@ void writeToSerial(String s) {
   Serial.flush();
 }
 
+//NOTE: you can NOT use serial actions in interrupts
+// Per Documented standards, it is recommended to set flags
+// in the interrupts, not do significant logic
 void registerPinActions() {
 
   #ifdef BOARD
     #if BOARD == seed_xiao_esp32c3
       // module mode cycle pin
       pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, CHANGE);
+      attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, RISING); // rising to activate when button released
       // rotate module pin
       pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D8), moduleCycle, CHANGE);
+      attachInterrupt(digitalPinToInterrupt(D8), moduleCycle, RISING); // rising to activate when button released
     #endif
   #endif
 }
 
 void activeModuleCycleModes() {
-  #ifdef BOARD
-    #if BOARD == seed_xiao_esp32c3
-      // check that the D7 pin is currently HIGH, indicating that a
-      // state change was triggered (button pressed) and the original
-      // state was restored (button released)
-      if(digitalRead(D7) != HIGH) {
-        return;
-      }
-    #else
-      return;  
-    #endif
-  #else
-    return;
-  #endif
-  mm->getActiveModule()->cycleMode();
+  shiftModes = true;
 }
 
 void moduleCycle() {
-  #ifdef BOARD
-    #if BOARD == seed_xiao_esp32c3
-      // check that the D8 pin is currently HIGH, indicating that a
-      // state change was triggered (button pressed) and the original
-      // state was restored (button released)
-      if(digitalRead(D8) != HIGH) {
-        return;
-      }
-    #else
-      return;  
-    #endif
-  #else
-    return;
-  #endif
-  mm->nextModule();
+  shiftModules = true;
 }
 
