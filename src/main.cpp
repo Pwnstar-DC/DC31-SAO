@@ -22,7 +22,7 @@ ModuleManager *mm;
 SSD1306 *display;
 
 void setup() {
-  Serial.setTxTimeoutMs(0);
+  //Serial.setRxTimeout(0);
   Serial.setTxBufferSize(5000);
   if(SERIAL_DEBUG){ 
     Serial.begin(115200);
@@ -90,11 +90,17 @@ void registerPinActions() {
   #ifdef BOARD
     #if BOARD == seed_xiao_esp32c3
       // module mode cycle pin
-      pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, RISING); // rising to activate when button released
+      //pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
+      //attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, RISING); // rising to activate when button released
       // rotate module pin
-      pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D8), moduleCycle, RISING); // rising to activate when button released
+      //pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
+      //attachInterrupt(digitalPinToInterrupt(D8), moduleCycle, RISING); // rising to activate when button released
+    #endif
+    #if BOARD == upesy_wroom
+      pinMode(14, INPUT_PULLUP);
+      attachInterrupt(digitalPinToInterrupt(14), activeModuleCycleModes, RISING);
+      pinMode(12, INPUT_PULLUP);
+      attachInterrupt(digitalPinToInterrupt(12), moduleCycle, RISING);
     #endif
   #endif
 }

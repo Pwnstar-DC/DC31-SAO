@@ -6,6 +6,8 @@
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
+#include "gif_out"
+
 void BLEServerModule::printBuffer() {
   const char* test[] = {
     "Hack",
@@ -35,6 +37,20 @@ void BLEServerModule::writeCharacteristic(BLECharacteristic *pCharacteristic)
       if (value == "hack the planet" || value == "Hack the Planet" || value == "Hack The Planet")
       {
         activeDisplay->writeTest("Written to characteristic", 0, 0);
+        activeDisplay->flush();
+        activeDisplay->drawBitmap(bm1);
+        activeDisplay->drawBitmap(bm2);
+        activeDisplay->drawBitmap(bm3);
+        activeDisplay->drawBitmap(bm4);
+        activeDisplay->drawBitmap(bm5);
+        activeDisplay->drawBitmap(bm6);
+        activeDisplay->drawBitmap(bm7);
+        activeDisplay->drawBitmap(bm8);
+        activeDisplay->drawBitmap(bm9);
+        activeDisplay->drawBitmap(bm10);
+        activeDisplay->drawBitmap(bm11);
+        activeDisplay->drawBitmap(bm12);
+        activeDisplay->drawBitmap(bm13);
         Serial.println("Written to characteristic");
         delay(1000);
         break;

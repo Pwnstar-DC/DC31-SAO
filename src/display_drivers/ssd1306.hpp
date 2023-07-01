@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include "OLEDDisplay.h" // for access to font functions
+#include <Adafruit_GFX.h>
 
 class SSD1306 : public DisplayParent {
 
@@ -114,6 +115,12 @@ public:
         display->display();
         delay(500);
         display->flush();
+    }
+
+    void drawBitmap(const unsigned char myBitmap[])
+    {
+        display->drawXbm(0, 0, 128, 64, myBitmap);
+        //display->drawBitmap(0, 0, myBitmap, 128, 64, 1);
     }
 
     void write()
