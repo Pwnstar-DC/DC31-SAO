@@ -119,7 +119,7 @@ public:
 
     void drawBitmap(const unsigned char myBitmap[])
     {
-        display->drawXbm(0, 0, 128, 64, myBitmap);
+        display->drawXbm(0, 0, 128, 32, myBitmap);
         display->display();
         delay(100);
         display->clear();

@@ -64,7 +64,15 @@ void BLEServerModule::displaySplashScreen() {
 
 void BLEServerModule::setup()
 {
-
+  activeDisplay->drawBitmap(bm1);
+  activeDisplay->drawBitmap(bm2);
+  activeDisplay->drawBitmap(bm3);
+  activeDisplay->drawBitmap(bm4);
+  activeDisplay->drawBitmap(bm5);
+  activeDisplay->drawBitmap(bm6);
+  activeDisplay->drawBitmap(bm7);
+  activeDisplay->drawBitmap(bm8);
+  activeDisplay->drawBitmap(bm9);
   setLogicRefreshTime(100);
   setDisplayRefreshTime(200);
   
@@ -87,6 +95,7 @@ void BLEServerModule::setup()
 
 	pAdvertising = pServer->getAdvertising();
 	pAdvertising->start();
+
 }
 
 void BLEServerModule::teardown() {
