@@ -8,23 +8,6 @@
 
 #include "bitmap"
 
-void BLEServerModule::printBuffer() {
-  const char* test[] = {
-    "Hack",
-    "The",
-    "Planet"};
-
-    for (uint8_t i = 0; i < 11; i++) {
-      // Print to the screen
-      //activeDisplay->writeTest("It Worked!", 0, 0);
-      // Draw it to the internal screen buffer
-      //display.drawLogBuffer(0, 0);
-      // Display it on the screen
-      //display.display();
-      delay(500);
-  }
-}
-
 void BLEServerModule::writeCharacteristic(BLECharacteristic *pCharacteristic)
 {
   String value = pCharacteristic->getValue().c_str();
@@ -34,25 +17,33 @@ void BLEServerModule::writeCharacteristic(BLECharacteristic *pCharacteristic)
     Serial.println("*********");
     for (int i = 0; i < value.length(); i++)
     {
-      if (value == "hack the planet" || value == "Hack the Planet" || value == "Hack The Planet")
+      if(value == "ngtgyu")
       {
-        activeDisplay->drawBitmap(bm1);
-        activeDisplay->drawBitmap(bm2);
-        activeDisplay->drawBitmap(bm3);
-        activeDisplay->drawBitmap(bm4);
-        activeDisplay->drawBitmap(bm5);
-        activeDisplay->drawBitmap(bm6);
-        activeDisplay->drawBitmap(bm7);
-        activeDisplay->drawBitmap(bm8);
-        activeDisplay->drawBitmap(bm9);
-        //delay(1000);
+        for(int j=0; j<9; j++)
+        {
+          activeDisplay->drawBitmap(rickroll[j]);
+          delay(50);
+        }
         break;
+      }
+      else if (value == "hack the planet" || value == "Hack The Planet")
+      {
+        for(int k=0; k<24; k++)
+        {
+          activeDisplay->drawBitmap(hacktheplanet[k]);
+        }
+      }
+      else
+      {
+
+        for(int l=0; l<59; l++)
+        {
+          activeDisplay->drawBitmap(lookaround_bm[l]);
+        }
+
       }
         
     }
-
-    Serial.println();
-    Serial.println("*********");
   }
 }
 
@@ -64,15 +55,6 @@ void BLEServerModule::displaySplashScreen() {
 
 void BLEServerModule::setup()
 {
-  activeDisplay->drawBitmap(bm1);
-  activeDisplay->drawBitmap(bm2);
-  activeDisplay->drawBitmap(bm3);
-  activeDisplay->drawBitmap(bm4);
-  activeDisplay->drawBitmap(bm5);
-  activeDisplay->drawBitmap(bm6);
-  activeDisplay->drawBitmap(bm7);
-  activeDisplay->drawBitmap(bm8);
-  activeDisplay->drawBitmap(bm9);
   setLogicRefreshTime(100);
   setDisplayRefreshTime(200);
   
