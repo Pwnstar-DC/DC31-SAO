@@ -4,6 +4,7 @@
 #include "freq_analysis.hpp"
 
 void FrequencyAnalysisDisplayModule::setup() {
+    esp_wifi_start();
     setDisplayRefreshTime(1500);
     setLogicRefreshTime(15000);
     // Set WiFi to station mode and disconnect from an AP if it was previously connected
@@ -18,6 +19,9 @@ void FrequencyAnalysisDisplayModule::setup() {
 
 void FrequencyAnalysisDisplayModule::teardown() {
     // netLineVector contains unique_ptrs, so no need to free
+
+    // power saving features
+    esp_wifi_stop();
     return;
 }
 
@@ -63,7 +67,7 @@ void FrequencyAnalysisDisplayModule::logicUpdate() {
         activeDisplay->drawProgress(scanningText, i, 0, 0, dispWidth, fontHeight);
         activeDisplay->write();
         i += 1;
-        delay(42);
+        delay(25);
         if(i == 100) {
             i = 0;
         }
@@ -165,9 +169,9 @@ void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset, int di
     String fmtStringBase = "%s : %s : %s";
     int bufSize = 512;
     char *buf = (char *) malloc(sizeof(char) * bufSize);
-    sprintf(buf, fmtStringBase.c_str(), "SSID", "POW", "CH");
-    activeDisplay->writeTextToScreen(String(buf), 0, yOffset, 512);
-    yOffset += getYOffsetIncrement();
+    // sprintf(buf, fmtStringBase.c_str(), "SSID", "POW", "CH");
+    // activeDisplay->writeTextToScreen(String(buf), 0, yOffset, 512);
+    // yOffset += getYOffsetIncrement();
 
     if(SERIAL_DEBUG) {
         Serial.println("FA-names: prepping to print objects");

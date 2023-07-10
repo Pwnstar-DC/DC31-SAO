@@ -2,6 +2,8 @@
 #include "./display_drivers/ssd1306.hpp"
 #include "./helpers/module_manager.hpp"
 #include "headers.hpp"
+#include <esp_bt.h>
+#include <esp_wifi.h>
 
 
 #ifndef SERIAL_DEBUG
@@ -41,7 +43,9 @@ void setup() {
   display->flush();
   displayWidth = display->getWidth();
   displayHeight = display->getHeight();
-  display->writeTextToScreen("initializing...", displayWidth/2, displayHeight/2);
+  display->writeTextToScreen("initializing..." + String(getXtalFrequencyMhz())+"mhz", 0, displayHeight/2);
+  display->flush();
+  delay(2000);
   writeToSerial("Finished initializing display...");
   writeToSerial("Initializing pins...");
   registerPinActions();
@@ -59,6 +63,13 @@ void setup() {
       display->writeTextToScreen("Failed to find module: \n" + initialModuleName, 0, 0);
       display->flush();
   }
+
+
+  // do power saving features
+  setCpuFrequencyMhz(getXtalFrequencyMhz()); // set minimum possible frequency per Xtal oscilator
+  esp_wifi_stop();
+  esp_bt_controller_disable();
+
   writeToSerial("Setup complete");
 
 }
@@ -112,6 +123,7 @@ void registerPinActions() {
       // toggle led
       pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
       attachInterrupt(digitalPinToInterrupt(D8), ledToggle, RISING); // rising to activate when button released
+      pinMode(D2, OUTPUT);
       digitalWrite(D2, HIGH);
     #endif
   #endif

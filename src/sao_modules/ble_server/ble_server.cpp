@@ -83,6 +83,9 @@ void BLEServerModule::setup()
 void BLEServerModule::teardown() {
   pService->stop();
   pAdvertising->stop();
+  // power saving features
+  btStop();
+  esp_bt_controller_disable();
 }
 
 void BLEServerModule::logicUpdate() {

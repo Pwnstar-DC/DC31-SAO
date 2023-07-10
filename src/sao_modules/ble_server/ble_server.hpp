@@ -1,3 +1,6 @@
+#ifndef BLESERVER_H
+#define BLESERVER_H
+
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
@@ -5,6 +8,7 @@
 #include "../../display_drivers/display_parent.hpp"
 #include "../../helpers/scrolling_buffer.hpp"
 #include "../..//display_drivers/ssd1306.hpp"
+#include <esp_bt.h>
 
 class BLEServerModule : public ModuleBase {
 
@@ -27,3 +31,5 @@ public:
     void teardown();
     void displaySplashScreen();
 };
+
+#endif

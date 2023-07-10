@@ -11,6 +11,7 @@
 #include "../../helpers/scrolling_buffer.hpp"
 #include <bits/stdc++.h>
 #include <OLEDDisplay.h>
+#include <esp_wifi.h>
 
 class WifiNetwork {
 public:
