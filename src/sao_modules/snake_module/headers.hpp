@@ -31,6 +31,8 @@ private:
     int nAnimationSpeeds = 3;
     int animationSpeeds[3] = {100, 50, 25};
     std::vector<std::shared_ptr<SnakeModuleBlock>> blocks;
+    std::vector<std::shared_ptr<SnakeModuleBlock>> dualingBlocks;
+    bool dualingSnakes = false;
 
 public:
 
@@ -48,6 +50,7 @@ public:
 
     void cycleMode();
 
+    void animateBlock(std::shared_ptr<SnakeModuleBlock> bl);
 };
 
 #endif

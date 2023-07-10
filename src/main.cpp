@@ -15,7 +15,9 @@ int displayHeight = 0;
 
 bool shiftModules = false;
 bool shiftModes = false;
-
+bool checkSleep = false;
+bool checkLed = true;
+bool ledOn = true;
 
 ModuleManager *mm;
 
@@ -70,7 +72,18 @@ void loop() {
     mm->nextModule();
     shiftModules = false;
   }
-
+  if(checkSleep) {
+    goToSleep();
+    checkSleep = false;
+  }
+  if(checkLed) {
+    ledOn = !ledOn;
+    #ifdef BOARD
+      #if BOARD == seed_xiao_esp32c3
+          digitalWrite(D2, ledOn);
+      #endif
+    #endif
+  }
   mm->triggerModuleUpdate();
 }
 
@@ -86,15 +99,23 @@ void writeToSerial(String s) {
 // Per Documented standards, it is recommended to set flags
 // in the interrupts, not do significant logic
 void registerPinActions() {
-
   #ifdef BOARD
     #if BOARD == seed_xiao_esp32c3
       // module mode cycle pin
-      pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D7), activeModuleCycleModes, RISING); // rising to activate when button released
+      pinMode(D0, INPUT_PULLUP); // use input_pullup for activate on ground
+      pinMode(D1, PULLDOWN);
+      digitalWrite(D1, LOW);
+      attachInterrupt(digitalPinToInterrupt(D0), activeModuleCycleModes, RISING); // rising to activate when button released
       // rotate module pin
-      pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D8), moduleCycle, RISING); // rising to activate when button released
+      pinMode(D9, INPUT_PULLUP); // use input_pullup for activate on ground
+      pinMode(D10, PULLDOWN);
+      digitalWrite(D10, LOW);
+      attachInterrupt(digitalPinToInterrupt(D9), moduleCycle, RISING); // rising to activate when button released
+      // toggle led
+      pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
+      pinMode(D8, PULLDOWN);
+      digitalWrite(D8, LOW);
+      attachInterrupt(digitalPinToInterrupt(D7), ledToggle, RISING); // rising to activate when button released
     #endif
   #endif
 }
@@ -105,5 +126,19 @@ void activeModuleCycleModes() {
 
 void moduleCycle() {
   shiftModules = true;
+}
+
+void toggleSleep() {
+   checkSleep = true;
+}
+
+void ledToggle() {
+  checkLed = true;
+}
+
+void goToSleep() {
+  display->setDisplayOff();
+  esp_deep_sleep_start();
+  display->setDisplayOn();
 }
 

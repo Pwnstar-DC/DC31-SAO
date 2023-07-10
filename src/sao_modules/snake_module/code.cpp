@@ -19,6 +19,15 @@ void SnakeModule::setup() {
                 0
             ))
         );
+
+        dualingBlocks.push_back(
+            std::shared_ptr<SnakeModuleBlock>(new SnakeModuleBlock(
+                activeDisplay->getWidth() + (-i*blockDims),
+                activeDisplay->getHeight() - blockDims,
+                1,
+                0
+            ))
+        );
     }
 
     if(SERIAL_DEBUG) {
@@ -39,6 +48,18 @@ void SnakeModule::displayUpdate() {
             bl->dimensions
         );
     }
+
+    if(dualingSnakes) {
+        for(const auto& bl : dualingBlocks) {
+            // draw block outline with origin top left corner at locXxlocY
+            activeDisplay->drawRect(
+                bl->locX,
+                bl->locY,
+                bl->dimensions,
+                bl->dimensions
+            );
+        }
+    }
     activeDisplay->flush();
 };
 
@@ -49,47 +70,59 @@ void SnakeModule::displaySplashScreen() {
 
 void SnakeModule::logicUpdate()  {
     for(const auto& bl: blocks) {
-        bl->locX += (bl->dimensions * bl->xVector);
-        bl->locY += (bl->dimensions * bl->yVector);
-
-        // check if blocks go out of bounding area (screen max width or height - dimensions)
-        // based on current vector
-
-        // there will never be a case where an xVector will be set at the same time as a yVector4
-        // (at least for now)
-        if(bl->locX >= activeDisplay->getWidth()) {
-            bl->locX -= bl->dimensions;
-            bl->xVector = 0;
-            bl->yVector = 1;
-        }
-        else if(bl->locX <= 0) {
-            bl->locX += bl->dimensions;
-            bl->xVector = 0;
-            bl->yVector = -1;
-        }
-        else if(bl->locY >= activeDisplay->getHeight()) {
-            bl->locY -= bl->dimensions;
-            bl->yVector = 0;
-            bl->xVector = -1;
-        }
-        else if(bl->locY <= 0) {
-            bl->locY += bl->dimensions;
-            bl->yVector = 0;
-            bl->xVector = 1;
-        }
+        animateBlock(bl);
     }
-    return;
+    for(const auto& bl: dualingBlocks) {
+        animateBlock(bl);
+    };
 };
+
+void SnakeModule::animateBlock(std::shared_ptr<SnakeModuleBlock> bl) {
+    bl->locX += (bl->dimensions * bl->xVector);
+    bl->locY += (bl->dimensions * bl->yVector);
+
+    // check if blocks go out of bounding area (screen max width or height - dimensions)
+    // based on current vector
+
+    // there will never be a case where an xVector will be set at the same time as a yVector4
+    // (at least for now)
+    if(bl->locX >= activeDisplay->getWidth()) {
+        bl->locX -= bl->dimensions;
+        bl->xVector = 0;
+        bl->yVector = 1;
+    }
+    else if(bl->locX <= 0) {
+        bl->locX += bl->dimensions;
+        bl->xVector = 0;
+        bl->yVector = -1;
+    }
+    else if(bl->locY >= activeDisplay->getHeight()) {
+        bl->locY -= bl->dimensions;
+        bl->yVector = 0;
+        bl->xVector = -1;
+    }
+    else if(bl->locY <= 0) {
+        bl->locY += bl->dimensions;
+        bl->yVector = 0;
+        bl->xVector = 1;
+    }
+}
 
 void SnakeModule::cycleMode() {
     setLogicRefreshTime(animationSpeeds[animationSpeedInd]);
     setDisplayRefreshTime(animationSpeeds[animationSpeedInd]);
 
     animationSpeedInd = (animationSpeedInd + 1) % nAnimationSpeeds;
+    // dual snakes after a full rotation of speeds
+    if(animationSpeedInd == 0) {
+        dualingSnakes = !dualingSnakes;
+    }
 }
 
 void SnakeModule::teardown() {
     // no need to free the snake module blocks since they are smart pointers
+    blocks.clear();
+    dualingBlocks.clear();
 }
 
 #endif

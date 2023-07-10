@@ -11,4 +11,10 @@ void registerPinActions();
 
 void moduleCycle();
 
+void toggleSleep();
+
+void goToSleep();
+
+void ledToggle();
+
 #endif 
