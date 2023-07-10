@@ -6,22 +6,7 @@
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-void BLEServerModule::printBuffer() {
-  const char* test[] = {
-    "Hack",
-    "The",
-    "Planet"};
-
-    for (uint8_t i = 0; i < 11; i++) {
-      // Print to the screen
-      //activeDisplay->writeTest("It Worked!", 0, 0);
-      // Draw it to the internal screen buffer
-      //display.drawLogBuffer(0, 0);
-      // Display it on the screen
-      //display.display();
-      delay(500);
-  }
-}
+#include "bitmap"
 
 void BLEServerModule::writeCharacteristic(BLECharacteristic *pCharacteristic)
 {
@@ -32,18 +17,33 @@ void BLEServerModule::writeCharacteristic(BLECharacteristic *pCharacteristic)
     Serial.println("*********");
     for (int i = 0; i < value.length(); i++)
     {
-      if (value == "hack the planet" || value == "Hack the Planet" || value == "Hack The Planet")
+      if(value == "ngtgyu")
       {
-        activeDisplay->writeTest("Written to characteristic", 0, 0);
-        Serial.println("Written to characteristic");
-        delay(1000);
+        for(int j=0; j<9; j++)
+        {
+          activeDisplay->drawBitmap(rickroll[j]);
+          delay(50);
+        }
         break;
+      }
+      else if (value == "hack the planet" || value == "Hack The Planet")
+      {
+        for(int k=0; k<24; k++)
+        {
+          activeDisplay->drawBitmap(hacktheplanet[k]);
+        }
+      }
+      else
+      {
+
+        for(int l=0; l<59; l++)
+        {
+          activeDisplay->drawBitmap(lookaround_bm[l]);
+        }
+
       }
         
     }
-
-    Serial.println();
-    Serial.println("*********");
   }
 }
 
@@ -55,7 +55,6 @@ void BLEServerModule::displaySplashScreen() {
 
 void BLEServerModule::setup()
 {
-
   setLogicRefreshTime(100);
   setDisplayRefreshTime(200);
   
@@ -78,6 +77,7 @@ void BLEServerModule::setup()
 
 	pAdvertising = pServer->getAdvertising();
 	pAdvertising->start();
+
 }
 
 void BLEServerModule::teardown() {

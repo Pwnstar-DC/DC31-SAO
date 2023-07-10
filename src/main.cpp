@@ -24,7 +24,7 @@ ModuleManager *mm;
 SSD1306 *display;
 
 void setup() {
-  Serial.setTxTimeoutMs(0);
+  //Serial.setRxTimeout(0);
   Serial.setTxBufferSize(5000);
   if(SERIAL_DEBUG){ 
     Serial.begin(115200);
