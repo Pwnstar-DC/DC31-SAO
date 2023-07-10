@@ -71,6 +71,9 @@ void setup() {
   esp_wifi_stop();
   esp_bt_controller_disable();
   display->setBrightness(50);
+  if(getCpuFrequencyMhz() > getXtalFrequencyMhz()) {
+    setCpuFrequencyMhz(80);
+  }
 
   writeToSerial("Setup complete");
 
