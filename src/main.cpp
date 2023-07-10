@@ -103,19 +103,17 @@ void registerPinActions() {
     #if BOARD == seed_xiao_esp32c3
       // module mode cycle pin
       pinMode(D0, INPUT_PULLUP); // use input_pullup for activate on ground
-      pinMode(D1, PULLDOWN);
-      digitalWrite(D1, LOW);
+      digitalWrite(D1, HIGH);
       attachInterrupt(digitalPinToInterrupt(D0), activeModuleCycleModes, RISING); // rising to activate when button released
       // rotate module pin
       pinMode(D9, INPUT_PULLUP); // use input_pullup for activate on ground
-      pinMode(D10, PULLDOWN);
-      digitalWrite(D10, LOW);
+      digitalWrite(D10, HIGH);
       attachInterrupt(digitalPinToInterrupt(D9), moduleCycle, RISING); // rising to activate when button released
       // toggle led
       pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
-      pinMode(D8, PULLDOWN);
-      digitalWrite(D8, LOW);
+      digitalWrite(D8, HIGH);
       attachInterrupt(digitalPinToInterrupt(D7), ledToggle, RISING); // rising to activate when button released
+      digitalWrite(D2, ledOn);
     #endif
   #endif
 }
