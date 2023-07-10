@@ -19,6 +19,7 @@ bool checkSleep = false;
 bool checkLed = true;
 bool ledOn = true;
 
+
 ModuleManager *mm;
 
 SSD1306 *display;
@@ -104,19 +105,13 @@ void registerPinActions() {
     #if BOARD == seed_xiao_esp32c3
       // module mode cycle pin
       pinMode(D0, INPUT_PULLUP); // use input_pullup for activate on ground
-      pinMode(D1, PULLDOWN);
-      digitalWrite(D1, LOW);
       attachInterrupt(digitalPinToInterrupt(D0), activeModuleCycleModes, RISING); // rising to activate when button released
       // rotate module pin
-      pinMode(D9, INPUT_PULLUP); // use input_pullup for activate on ground
-      pinMode(D10, PULLDOWN);
-      digitalWrite(D10, LOW);
-      attachInterrupt(digitalPinToInterrupt(D9), moduleCycle, RISING); // rising to activate when button released
+      pinMode(D10, INPUT_PULLUP); // use input_pullup for activate on ground
+      attachInterrupt(digitalPinToInterrupt(D10), moduleCycle, RISING); // rising to activate when button released
       // toggle led
-      pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
-      pinMode(D8, PULLDOWN);
-      digitalWrite(D8, LOW);
-      attachInterrupt(digitalPinToInterrupt(D7), ledToggle, RISING); // rising to activate when button released
+      pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
+      attachInterrupt(digitalPinToInterrupt(D8), ledToggle, RISING); // rising to activate when button released
       digitalWrite(D2, HIGH);
     #endif
   #endif
