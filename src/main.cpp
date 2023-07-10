@@ -77,10 +77,11 @@ void loop() {
     checkSleep = false;
   }
   if(checkLed) {
+    checkLed = false;
     ledOn = !ledOn;
     #ifdef BOARD
       #if BOARD == seed_xiao_esp32c3
-          digitalWrite(D2, ledOn);
+          digitalWrite(D2, int(ledOn));
       #endif
     #endif
   }
@@ -103,17 +104,20 @@ void registerPinActions() {
     #if BOARD == seed_xiao_esp32c3
       // module mode cycle pin
       pinMode(D0, INPUT_PULLUP); // use input_pullup for activate on ground
-      digitalWrite(D1, HIGH);
+      pinMode(D1, PULLDOWN);
+      digitalWrite(D1, LOW);
       attachInterrupt(digitalPinToInterrupt(D0), activeModuleCycleModes, RISING); // rising to activate when button released
       // rotate module pin
       pinMode(D9, INPUT_PULLUP); // use input_pullup for activate on ground
-      digitalWrite(D10, HIGH);
+      pinMode(D10, PULLDOWN);
+      digitalWrite(D10, LOW);
       attachInterrupt(digitalPinToInterrupt(D9), moduleCycle, RISING); // rising to activate when button released
       // toggle led
       pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
-      digitalWrite(D8, HIGH);
+      pinMode(D8, PULLDOWN);
+      digitalWrite(D8, LOW);
       attachInterrupt(digitalPinToInterrupt(D7), ledToggle, RISING); // rising to activate when button released
-      digitalWrite(D2, ledOn);
+      digitalWrite(D2, HIGH);
     #endif
   #endif
 }
