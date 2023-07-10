@@ -42,6 +42,7 @@ public:
     virtual void setDisplayOn() {};
     virtual int getColor() { return 0; };
     virtual void setColor(int c) {};
+    virtual void setBrightness(int b) {};
 };
 
 #endif

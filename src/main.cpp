@@ -55,6 +55,7 @@ void setup() {
   writeToSerial("Activating initial module...");
   String initialModuleName = "snake_module";
   ModuleBase *mod = mm->getModuleByName(initialModuleName);
+  
   if(mod) {
     mm->activateModule(mod);
   }
@@ -69,6 +70,7 @@ void setup() {
   setCpuFrequencyMhz(getXtalFrequencyMhz()); // set minimum possible frequency per Xtal oscilator
   esp_wifi_stop();
   esp_bt_controller_disable();
+  display->setBrightness(50);
 
   writeToSerial("Setup complete");
 

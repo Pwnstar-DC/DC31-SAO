@@ -213,6 +213,18 @@ public:
         display->setColor((OLEDDISPLAY_COLOR)c);
     }
 
+    void setBrightness(int b) {
+        if(b > 100) {
+            display->setContrast(100);
+        }
+        if(b < 100) {
+            display->setContrast(1);
+        }
+        else {
+            display->setContrast(b);  
+        }
+    }
+
 };
 
 #endif
