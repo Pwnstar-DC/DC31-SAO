@@ -45,6 +45,8 @@ public:
 
     ModuleBase * getActiveModule();
 
+    String getActiveModuleString(ModuleBase * mod);
+
     void activateModule(int index);
 
     void activateModule(ModuleBase * mod);

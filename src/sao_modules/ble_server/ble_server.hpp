@@ -24,8 +24,6 @@ public:
 
     void printBuffer();
 
-    void writeCharacteristic(BLECharacteristic *pCharacteristic);
-
     void logicUpdate();
     void displayUpdate();
     void teardown();

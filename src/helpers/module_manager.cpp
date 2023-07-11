@@ -16,6 +16,11 @@ ModuleBase* ModuleManager::getActiveModule() {
     return activeModule;
 }
 
+String ModuleManager::getActiveModuleString(ModuleBase * mod)
+{
+    return mod->getName(); 
+}
+
 void ModuleManager::activateModule(int index) {
     if(!(index >= 0 && index < REGISTERED_MODULES.size())) {
         return; // error case

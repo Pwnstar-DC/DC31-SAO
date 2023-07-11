@@ -11,7 +11,7 @@
 #endif
 
 
-int i = 1;
+//int i = 1;
 int displayWidth = 0;
 int displayHeight = 0;
 
@@ -65,16 +65,20 @@ void setup() {
       display->flush();
   }
 
-
   // do power saving features
-  setCpuFrequencyMhz(getXtalFrequencyMhz()); // set minimum possible frequency per Xtal oscilator
+  //setCpuFrequencyMhz(getXtalFrequencyMhz()); // set minimum possible frequency per Xtal oscilator
+  setCpuFrequencyMhz(80);
+
+
   esp_wifi_stop();
-  esp_bt_controller_disable();
+  if(mm->getActiveModuleString(mod) != "ble_server_module")
+  {
+    esp_bt_controller_disable();
+  }
   display->setBrightness(50);
   if(getCpuFrequencyMhz() > getXtalFrequencyMhz()) {
     setCpuFrequencyMhz(80);
   }
-
   writeToSerial("Setup complete");
 
 }
@@ -123,8 +127,8 @@ void registerPinActions() {
       pinMode(D0, INPUT_PULLUP); // use input_pullup for activate on ground
       attachInterrupt(digitalPinToInterrupt(D0), activeModuleCycleModes, RISING); // rising to activate when button released
       // rotate module pin
-      pinMode(D10, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D10), moduleCycle, RISING); // rising to activate when button released
+      pinMode(D9, INPUT_PULLUP); // use input_pullup for activate on ground
+      attachInterrupt(digitalPinToInterrupt(D9), moduleCycle, RISING); // rising to activate when button released
       // toggle led
       pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
       attachInterrupt(digitalPinToInterrupt(D8), ledToggle, RISING); // rising to activate when button released
