@@ -18,9 +18,9 @@ int displayHeight = 0;
 bool shiftModules = false;
 bool shiftModes = false;
 bool checkSleep = false;
-bool checkLed = true;
+bool checkLed = false;
 bool ledOn = true;
-
+int64_t boot_time;
 
 ModuleManager *mm;
 
@@ -68,45 +68,50 @@ void setup() {
   // do power saving features
   setCpuFrequencyMhz(80);
 
-
   esp_wifi_stop();
   if(mm->getActiveModuleString(mod) != "ble_server_module")
   {
     esp_bt_controller_disable();
   }
   display->setBrightness(50);
-  if(getCpuFrequencyMhz() > getXtalFrequencyMhz()) {
-    setCpuFrequencyMhz(80);
-  }
+  setCpuFrequencyMhz(80);
+  boot_time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
   writeToSerial("Setup complete");
-
 }
 
 void loop() {
 
-  if(shiftModes) {
-    mm->getActiveModule()->cycleMode();
+  if(shiftModes || shiftModules || checkSleep || checkLed) {
+    int64_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+
+    // protect the button triggers for 1 second after boot to prevent startup-related rising triggers
+    if(now + 1000 > boot_time) {
+        if(shiftModes) {
+        mm->getActiveModule()->cycleMode();
+      }
+      if(shiftModules) {
+        mm->nextModule();
+      }
+      if(checkSleep) {
+        goToSleep();
+      }
+      if(checkLed) {
+        ledOn = !ledOn;
+        #ifdef BOARD
+          #if BOARD == seed_xiao_esp32c3
+              digitalWrite(D0, int(ledOn));
+              digitalWrite(D1, int(ledOn));
+              digitalWrite(D2, int(ledOn));
+          #endif
+        #endif
+      }
+    }
+
     shiftModes = false;
-  }
-  if(shiftModules) {
-    mm->nextModule();
     shiftModules = false;
-  }
-  if(checkSleep) {
-    goToSleep();
-    checkSleep = false;
-  }
-  if(checkLed) {
-    display->flush();
     checkLed = false;
-    ledOn = !ledOn;
-    #ifdef BOARD
-      #if BOARD == seed_xiao_esp32c3
-          digitalWrite(D0, int(ledOn));
-          digitalWrite(D1, int(ledOn));
-          digitalWrite(D2, int(ledOn));
-      #endif
-    #endif
+    checkSleep = false;
+
   }
   mm->triggerModuleUpdate();
 }
