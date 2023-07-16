@@ -8,44 +8,10 @@
 
 #include "bitmap"
 
-void BLEServerModule::writeCharacteristic(BLECharacteristic *pCharacteristic)
-{
-  String value = pCharacteristic->getValue().c_str();
+const unsigned char** gif_bitmap;
+int counter = 0;
+int MAX_COUNT = 0;
 
-  if (value.length() > 0)
-  {
-    Serial.println("*********");
-    for (int i = 0; i < value.length(); i++)
-    {
-      if(value == "ngtgyu")
-      {
-        for(int j=0; j<9; j++)
-        {
-          activeDisplay->drawBitmap(rickroll[j]);
-          delay(50);
-        }
-        break;
-      }
-      else if (value == "hack the planet" || value == "Hack The Planet")
-      {
-        for(int k=0; k<24; k++)
-        {
-          activeDisplay->drawBitmap(hacktheplanet[k]);
-        }
-      }
-      else
-      {
-
-        for(int l=0; l<59; l++)
-        {
-          activeDisplay->drawBitmap(lookaround_bm[l]);
-        }
-
-      }
-        
-    }
-  }
-}
 
 void BLEServerModule::displaySplashScreen() {
   activeDisplay->clear();
@@ -55,8 +21,11 @@ void BLEServerModule::displaySplashScreen() {
 
 void BLEServerModule::setup()
 {
+
+  gif_bitmap = lookaround_bm;
+  MAX_COUNT = 59;
   setLogicRefreshTime(100);
-  setDisplayRefreshTime(200);
+  setDisplayRefreshTime(50);
   
   activeDisplay->flush();
 
@@ -92,16 +61,29 @@ void BLEServerModule::logicUpdate() {
   String compare;
   String valtostring;
   valtostring = pCharacteristic->getValue().c_str();
-    if(compare != valtostring)
-    {
-      Serial.println("Characteristic Written");
-      writeCharacteristic(pCharacteristic);
-    }
-    compare = valtostring;
+
+  if(valtostring == "ngtgyu")
+  {
+    counter = 0;
+    MAX_COUNT = 9;
+    gif_bitmap = rickroll;
+  }
+  if(valtostring == "hack the planet")
+  {
+    counter = 0;
+    MAX_COUNT = 24;
+    gif_bitmap = hacktheplanet;
+  }
+
+  pCharacteristic->setValue("Hello World");
 }
 
 void BLEServerModule::displayUpdate() {
+  if(counter == MAX_COUNT) counter = 0;
+  activeDisplay->drawBitmap(gif_bitmap[counter]);
+  counter++;
   activeDisplay->flush();
 }
+
 
 #endif

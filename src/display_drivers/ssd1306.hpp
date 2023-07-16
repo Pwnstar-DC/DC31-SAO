@@ -98,6 +98,21 @@ public:
         display->mirrorScreen();
     }
 
+        void clear() {
+        display->clear();
+        display->display();
+    }
+
+    void clear(int locX, int locY, int width, int height) {
+        for(int i = locX; i < width; i++) {
+            for(int j = locY; j < height; j++) {
+                display->clearPixel(i, j);
+            }
+        }
+        display->display();
+    }
+
+
     void flush() {
         display->display();
         display->clear();
@@ -119,11 +134,7 @@ public:
 
     void drawBitmap(const unsigned char myBitmap[])
     {
-        display->drawXbm(0, 0, 128, 32, myBitmap);
-        display->display();
-        delay(50);
-        display->clear();
-        //display->drawBitmap(0, 0, myBitmap, 128, 64, 1);
+        display->drawXbm(0, 0, DISPLAY_WIDTH_MAX, DISPLAY_HEIGHT_MAX, myBitmap);
     }
 
     void write()
@@ -165,20 +176,6 @@ public:
 
     void drawVLine(int locX, int locY, int len) {
         display->drawVerticalLine(locX, locY, len);
-    }
-
-    void clear() {
-        display->clear();
-        display->display();
-    }
-
-    void clear(int locX, int locY, int width, int height) {
-        for(int i = locX; i < width; i++) {
-            for(int j = locY; j < height; j++) {
-                display->clearPixel(i, j);
-            }
-        }
-        display->display();
     }
 
     void clearDisplayBuffer() {
