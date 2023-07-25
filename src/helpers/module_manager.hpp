@@ -23,7 +23,6 @@ private:
     }
 
 public:
-
     ModuleManager(DisplayParent *dispP) {
         writeToSerial("Registering modules...");
         REGISTERED_MODULES.push_back(
@@ -60,6 +59,7 @@ public:
     ModuleBase * getModuleByName(String name);
 
     void nextModule(); // deactivate current module and activate the next one
+
 };
 
 #endif

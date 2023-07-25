@@ -66,15 +66,13 @@ void setup() {
   }
 
   // do power saving features
-  setCpuFrequencyMhz(80);
-
   esp_wifi_stop();
   if(mm->getActiveModuleString(mod) != "ble_server_module")
   {
     esp_bt_controller_disable();
   }
-  display->setBrightness(50);
-  setCpuFrequencyMhz(80);
+  display->setBrightness(40);
+  setCpuFrequencyMhz(getXtalFrequencyMhz());
   boot_time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
   writeToSerial("Setup complete");
 }
@@ -99,9 +97,9 @@ void loop() {
         ledOn = !ledOn;
         #ifdef BOARD
           #if BOARD == seed_xiao_esp32c3
-              digitalWrite(D0, int(ledOn));
-              digitalWrite(D1, int(ledOn));
-              digitalWrite(D2, int(ledOn));
+              ledcWrite(0, 256 * ledOn);
+              ledcWrite(1, 256 * ledOn);
+              ledcWrite(2, 256 * ledOn);
           #endif
         #endif
       }
@@ -133,28 +131,33 @@ void registerPinActions() {
       // toggle led
       pinMode(D7, INPUT_PULLUP); // use input_pullup for activate on ground
       attachInterrupt(digitalPinToInterrupt(D7), ledToggle, RISING); // rising to activate when button released
-      pinMode(D0, OUTPUT);
-      digitalWrite(D0, HIGH);
-      pinMode(D1, OUTPUT);
-      digitalWrite(D1, HIGH);
-      pinMode(D2, OUTPUT);
-      digitalWrite(D2, HIGH);
+
+      ledcSetup(0, 10000, 8);
+      ledcSetup(1, 10000, 8);
+      ledcSetup(2, 10000, 8);
+      ledcAttachPin(GPIO_NUM_2, 0);
+      ledcAttachPin(GPIO_NUM_3, 1);
+      ledcAttachPin(GPIO_NUM_4, 2);
+      ledcWrite(0, 256);
+      ledcWrite(1, 256);
+      ledcWrite(2, 256);
+
       // rotate module pin
       pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D8), moduleCycle, RISING); // rising to activate when button released
+      attachInterrupt(digitalPinToInterrupt(D8), activeModuleModeCycle, RISING); // rising to activate when button released
       // module mode cycle pin
       pinMode(D9, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D9), activeModuleCycleModes, RISING); // rising to activate when button released
+      attachInterrupt(digitalPinToInterrupt(D9), activeModuleCycle, RISING); // rising to activate when button released
       
     #endif
   #endif
 }
 
-void activeModuleCycleModes() {
+void activeModuleModeCycle() {
   shiftModes = true;
 }
 
-void moduleCycle() {
+void activeModuleCycle() {
   shiftModules = true;
 }
 

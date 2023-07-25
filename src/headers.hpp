@@ -5,11 +5,11 @@
 
 void writeToSerial(String s);
 
-void activeModuleCycleModes();
+void activeModuleCycle();
 
 void registerPinActions();
 
-void moduleCycle();
+void activeModuleModeCycle();
 
 void toggleSleep();
 

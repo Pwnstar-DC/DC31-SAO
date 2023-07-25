@@ -21,7 +21,8 @@ void BLEServerModule::displaySplashScreen() {
 
 void BLEServerModule::setup()
 {
-
+  setCpuFrequencyMhz(80); // minimum required to operate this module
+  delay(25);
   gif_bitmap = lookaround_bm;
   MAX_COUNT = 59;
   setLogicRefreshTime(100);
@@ -55,9 +56,10 @@ void BLEServerModule::teardown() {
   // power saving features
   btStop();
   esp_bt_controller_disable();
+  setCpuFrequencyMhz(getXtalFrequencyMhz()); // reset to minimum required to operate controller
 }
 
-void BLEServerModule::logicUpdate() {
+void BLEServerModule::logicUpdate(int64_t lastMetaLogicUpdate) {
   String compare;
   String valtostring;
   valtostring = pCharacteristic->getValue().c_str();
@@ -78,7 +80,7 @@ void BLEServerModule::logicUpdate() {
   pCharacteristic->setValue("Hello World");
 }
 
-void BLEServerModule::displayUpdate() {
+void BLEServerModule::displayUpdate(int64_t lastMetaDisplayUpdate) {
   if(counter == MAX_COUNT) counter = 0;
   activeDisplay->drawBitmap(gif_bitmap[counter]);
   counter++;

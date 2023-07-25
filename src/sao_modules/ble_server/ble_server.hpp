@@ -10,6 +10,7 @@
 #include "../..//display_drivers/ssd1306.hpp"
 #include <esp_bt.h>
 
+
 class BLEServerModule : public ModuleBase {
 
 public:
@@ -24,8 +25,8 @@ public:
 
     void printBuffer();
 
-    void logicUpdate();
-    void displayUpdate();
+    void logicUpdate(int64_t lastMetaLogicUpdate);
+    void displayUpdate(int64_t lastMetaDisplayUpdate);
     void teardown();
     void displaySplashScreen();
 };

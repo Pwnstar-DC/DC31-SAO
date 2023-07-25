@@ -57,9 +57,23 @@ private:
     int availableNetworks = 0;
     enum Modes { names, sigGraph };
     Modes mode = names;
-
+    int scanProgressDisplay = 0;
+    String scanningText = "Scanning...";
+    int dispWidth = 0;
+    int dispHeight = 0;
+    int widthOfScanText = 0;
+    int fontHeight = 0;
+    bool rebuildNetworkInformation = false;
+    int yOffset = 0;
 public:
-    FrequencyAnalysisDisplayModule(DisplayParent *display, String name) : ModuleBase(display, name) {};
+    
+
+    FrequencyAnalysisDisplayModule(DisplayParent *display, String name) : ModuleBase(display, name) {
+        dispWidth = activeDisplay->getWidth();
+        dispHeight = activeDisplay->getHeight();
+        widthOfScanText = activeDisplay->getWidthOfText(scanningText);
+        fontHeight = activeDisplay->getFontOffsetCharHeight();
+    };
     
     void draw();
 
@@ -71,9 +85,9 @@ public:
 
     void teardown();
 
-    void logicUpdate();
+    void logicUpdate(int64_t lastMetaLogicUpdate);
 
-    void displayUpdate();
+    void displayUpdate(int64_t lastMetaDisplayUpdate);
 
     void displaySplashScreen();
 };

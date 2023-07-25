@@ -17,6 +17,10 @@ private:
     bool previouslyActive = false;
     int64_t lastDisplayRefresh = 0;
     int64_t lastLogicRefresh = 0;
+    int64_t lastMetaDisplayUpdate = 0;
+    int64_t lastMetaLogicUpdate = 0;
+    int metaDisplayUpdateTime = 10000;
+    int metaLogicUpdateTime = 10000;
     int displayRefreshTime = 250;
     int logicRefreshTime = 10000;
     int lineSpaceOffset = 0.5;
@@ -34,8 +38,8 @@ public:
     }
 
     virtual void setup() {};
-    virtual void displayUpdate() {};
-    virtual void logicUpdate() {};
+    virtual void displayUpdate(int64_t timeSinceLastMetaDisplayUpdate) {};
+    virtual void logicUpdate(int64_t timeSinceLastMetaLogicUpdate) {};
     virtual void teardown() {}
     virtual bool getIsSessionPersistent() {
         return isSessionPersistent;
@@ -56,12 +60,21 @@ public:
         int64_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
         if(now > (lastLogicRefresh + logicRefreshTime)) {
-            logicUpdate();
+            if(now > (lastMetaLogicUpdate + metaLogicUpdateTime)) {
+                lastMetaLogicUpdate = now;
+            }
+
+            logicUpdate(now - lastMetaLogicUpdate);
             lastLogicRefresh = now;
             logicUpdateSinceLastDisplayUpdate = true;
         }
+
         if(now > (lastDisplayRefresh + displayRefreshTime)) {
-            displayUpdate();
+            if(now > (lastMetaDisplayUpdate + metaDisplayUpdateTime)) {
+                lastMetaDisplayUpdate = now;
+            }
+            
+            displayUpdate(now - lastMetaDisplayUpdate);
             lastDisplayRefresh = now;
             logicUpdateSinceLastDisplayUpdate = false;
         }
@@ -85,6 +98,14 @@ public:
         logicRefreshTime = r;
     }
 
+    virtual void setMetaDisplayUpdateTime(int r) {
+        metaDisplayUpdateTime = r;
+    }
+
+    virtual void setMetaLogicUpdateTime(int r) {
+        metaLogicUpdateTime = r;
+    }
+
     virtual String getName() {
         return moduleName;
     }
@@ -93,6 +114,13 @@ public:
         if(!isSessionPersistent) {
             teardown();
         }
+    }
+
+    void clearMetaLogicUpdateTime() {
+        lastMetaLogicUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+    }
+    void clearMetaDisplayUpdateTime() {
+        lastMetaDisplayUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
     }
 
 };

@@ -4,9 +4,12 @@
 #include "freq_analysis.hpp"
 
 void FrequencyAnalysisDisplayModule::setup() {
+    setCpuFrequencyMhz(80); // minimum required to operate this module
+    delay(25);
     esp_wifi_start();
     setDisplayRefreshTime(1500);
-    setLogicRefreshTime(15000);
+    setLogicRefreshTime(25);
+    setMetaLogicUpdateTime(15000);
     // Set WiFi to station mode and disconnect from an AP if it was previously connected
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
@@ -22,6 +25,7 @@ void FrequencyAnalysisDisplayModule::teardown() {
 
     // power saving features
     esp_wifi_stop();
+    setCpuFrequencyMhz(getXtalFrequencyMhz()); // reset mhz to lowest possible
     return;
 }
 
@@ -51,62 +55,48 @@ void FrequencyAnalysisDisplayModule::displaySplashScreen() {
     delay(2000);
 }
 
-void FrequencyAnalysisDisplayModule::logicUpdate() {
-    WiFi.scanDelete();
-    WiFi.scanNetworks(true, true, 10000);
-
-    int i = 0;
-    // clear the area specifically around the scanning text, not entire screen
-    String scanningText = "Scanning...";
-    int dispWidth = activeDisplay->getWidth();
-    int widthOfScanText = activeDisplay->getWidthOfText(scanningText);
-    int fontHeight = activeDisplay->getFontOffsetCharHeight();
-    activeDisplay->clear(0, 0, dispWidth, fontHeight);
-    activeDisplay->write();
-    while(WiFi.scanComplete() == -1) {
-        activeDisplay->drawProgress(scanningText, i, 0, 0, dispWidth, fontHeight);
+void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
+    if(lastMetaLogicUpdate == 0) {
+        WiFi.scanDelete();
+        WiFi.scanNetworks(true, true, 10000);
+        scanProgressDisplay = 0;
+        // clear the area specifically around the scanning text, not entire screen
+        activeDisplay->clear(0, 0, dispWidth, fontHeight);
         activeDisplay->write();
-        i += 1;
-        delay(25);
-        if(i == 100) {
-            i = 0;
+        rebuildNetworkInformation = true;
+    }
+
+    if(WiFi.scanComplete() == -1) {
+        clearMetaLogicUpdateTime();
+        if(scanProgressDisplay <= 100) {
+            activeDisplay->drawProgress(scanningText, scanProgressDisplay, 0, 0, dispWidth, fontHeight);
+            activeDisplay->write();
+            scanProgressDisplay += 1;
         }
     }
-    availableNetworks = WiFi.scanComplete();
-
-    if(SERIAL_DEBUG) {
-        Serial.println("Scanned networks; found: " + String(availableNetworks));
+    else {
+        if(rebuildNetworkInformation) {
+            availableNetworks = WiFi.scanComplete();
+            buildNetworkInformation();
+            rebuildNetworkInformation = false;
+            activeDisplay->clear(0, 0, dispWidth, fontHeight);
+            activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, 0);
+            activeDisplay->write();
+        }
     }
 }
 
-void FrequencyAnalysisDisplayModule::displayUpdate()
+void FrequencyAnalysisDisplayModule::displayUpdate(int64_t lastMetaDisplayUpdate)
 {        
-    int yOffset = 0;
-    int dispWidth = activeDisplay->getWidth();
-    int dispHeight = activeDisplay->getHeight();
-    int fontHeight = activeDisplay->getFontOffsetCharHeight();
-    activeDisplay->clearDisplayBuffer();
-    activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, yOffset);
-    yOffset += activeDisplay->getFontOffsetCharHeight();
-
     if(availableNetworks <= 0) {
         return;
     }
 
-    if(!getHasLogicUpdateSinceLastDisplayUpdate()) {
-        // if we hit this, we will just want to
-        // scroll the buffer of existing data rather
-        // than re-build all of it`
-        if(SERIAL_DEBUG) {
-            Serial.println("FA: Scrolling objects");
-        }
-        netLineVector.shiftForward();
-    }
-    else {
-        if(SERIAL_DEBUG) {
-            Serial.println("FA: Rebuilding objects");
-        }
-        buildNetworkInformation();
+    yOffset = 0;
+    activeDisplay->clearDisplayBuffer();
+    if(!rebuildNetworkInformation) {
+        activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, 0);
+        activeDisplay->write();
     }
 
     switch(mode) {
@@ -114,7 +104,9 @@ void FrequencyAnalysisDisplayModule::displayUpdate()
             if(SERIAL_DEBUG) {
                 Serial.println("FA: refreshing data in names format");
             }
+            yOffset += activeDisplay->getFontOffsetCharHeight(); // leave space for text covered in logic update
             printNetworkInformation(yOffset, dispWidth, fontHeight);
+            netLineVector.shiftForward();
             break;
         case sigGraph:
             break;

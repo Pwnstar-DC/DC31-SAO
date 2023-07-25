@@ -212,13 +212,13 @@ public:
 
     void setBrightness(int b) {
         if(b > 100) {
-            display->setContrast(100);
+            display->setBrightness(100);
         }
-        if(b < 100) {
-            display->setContrast(1);
+        if(b < 0) {
+            display->setBrightness(1);
         }
         else {
-            display->setContrast(b);  
+            display->setBrightness(b); 
         }
     }
 

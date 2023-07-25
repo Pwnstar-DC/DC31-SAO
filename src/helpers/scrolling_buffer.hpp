@@ -56,7 +56,6 @@ public:
     bool empty() {
         return buffer.empty();
     }
-
     
 };
 

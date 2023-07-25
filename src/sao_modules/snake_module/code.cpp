@@ -36,7 +36,7 @@ void SnakeModule::setup() {
     }
 };
 
-void SnakeModule::displayUpdate() {
+void SnakeModule::displayUpdate(int64_t lastMetaDisplayUpdate) {
     activeDisplay->clear();
     // display the blocks
     for(const auto& bl : blocks) {
@@ -68,7 +68,7 @@ void SnakeModule::displaySplashScreen() {
     activeDisplay->flush();
 }
 
-void SnakeModule::logicUpdate()  {
+void SnakeModule::logicUpdate(int64_t lastMetaLogicUpdate)  {
     for(const auto& bl: blocks) {
         animateBlock(bl);
     }

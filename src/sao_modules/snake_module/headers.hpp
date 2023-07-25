@@ -40,9 +40,9 @@ public:
 
     void setup();
 
-    void displayUpdate();
+    void displayUpdate(int64_t lastMetaDisplayUpdate);
     
-    void logicUpdate();
+    void logicUpdate(int64_t lastMetaLogicUpdate);
     
     void teardown();
 
