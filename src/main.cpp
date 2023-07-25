@@ -19,7 +19,7 @@ bool shiftModules = false;
 bool shiftModes = false;
 bool checkSleep = false;
 bool checkLed = false;
-bool ledOn = true;
+int ledState = 2;
 int64_t boot_time;
 
 ModuleManager *mm;
@@ -94,12 +94,15 @@ void loop() {
         goToSleep();
       }
       if(checkLed) {
-        ledOn = !ledOn;
+        ledState += 1;
+        if(ledState > 2) {
+          ledState = 0;
+        }
         #ifdef BOARD
           #if BOARD == seed_xiao_esp32c3
-              ledcWrite(0, 256 * ledOn);
-              ledcWrite(1, 256 * ledOn);
-              ledcWrite(2, 256 * ledOn);
+              ledcWrite(0, 128 * ledState);
+              ledcWrite(1, 128 * ledState);
+              ledcWrite(2, 128 * ledState);
           #endif
         #endif
       }
@@ -138,9 +141,9 @@ void registerPinActions() {
       ledcAttachPin(GPIO_NUM_2, 0);
       ledcAttachPin(GPIO_NUM_3, 1);
       ledcAttachPin(GPIO_NUM_4, 2);
-      ledcWrite(0, 256);
-      ledcWrite(1, 256);
-      ledcWrite(2, 256);
+      ledcWrite(0, 128 * ledState);
+      ledcWrite(1, 128 * ledState);
+      ledcWrite(2, 128 * ledState);
 
       // rotate module pin
       pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
