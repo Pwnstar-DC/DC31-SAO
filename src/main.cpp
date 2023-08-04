@@ -178,3 +178,22 @@ void goToSleep() {
   display->setDisplayOn();
 }
 
+void flashLeds(bool firstState, int firstStateTime, int secondStateTime) {
+  bool currentState = firstState;
+  // set led to first state
+  ledcWrite(0, 256 * currentState);
+  ledcWrite(1, 256 * currentState);
+  ledcWrite(2, 256 * currentState);
+  delay(firstStateTime);
+  // set to second state
+  currentState = !currentState;
+  ledcWrite(0, 256 * currentState);
+  ledcWrite(1, 256 * currentState);
+  ledcWrite(2, 256 * currentState);
+  delay(secondStateTime);
+  /// revert state
+  ledcWrite(0, 128 * currentState);
+  ledcWrite(1, 128 * currentState);
+  ledcWrite(2, 128 * currentState);
+}
+

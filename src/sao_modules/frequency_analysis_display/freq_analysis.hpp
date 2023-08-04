@@ -53,6 +53,7 @@ class FrequencyAnalysisDisplayModule : public ModuleBase {
 
 private:
     ScrollingBuffer<std::shared_ptr<WifiNetwork>> netLineVector;
+    ScrollingBuffer<std::shared_ptr<WifiNetwork>> displayLineVector;
     uint32_t counter = 0;
     int availableNetworks = 0;
     enum Modes { names, sigGraph };
@@ -64,7 +65,11 @@ private:
     int widthOfScanText = 0;
     int fontHeight = 0;
     bool rebuildNetworkInformation = false;
+    bool scannedAllChannels = false;
+    bool readLastScan = false;
     int yOffset = 0;
+    int nChannels = 14;
+    int currentChannel = 1;
 public:
     
 
@@ -90,6 +95,7 @@ public:
     void displayUpdate(int64_t lastMetaDisplayUpdate);
 
     void displaySplashScreen();
+
 };
 
 #endif

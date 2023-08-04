@@ -8,7 +8,7 @@ void FrequencyAnalysisDisplayModule::setup() {
     delay(25);
     esp_wifi_start();
     setDisplayRefreshTime(1500);
-    setLogicRefreshTime(25);
+    setLogicRefreshTime(50);
     setMetaLogicUpdateTime(15000);
     // Set WiFi to station mode and disconnect from an AP if it was previously connected
     WiFi.mode(WIFI_STA);
@@ -56,9 +56,12 @@ void FrequencyAnalysisDisplayModule::displaySplashScreen() {
 }
 
 void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
-    if(lastMetaLogicUpdate == 0) {
+    if(lastMetaLogicUpdate == 0 || (!scannedAllChannels && readLastScan)) {
+        scannedAllChannels = false;
+        rebuildNetworkInformation = true;
+        readLastScan = false;
         WiFi.scanDelete();
-        WiFi.scanNetworks(true, true, 10000);
+        WiFi.scanNetworks(true, true, false, 10000, currentChannel);
         scanProgressDisplay = 0;
         // clear the area specifically around the scanning text, not entire screen
         activeDisplay->clear(0, 0, dispWidth, fontHeight);
@@ -69,33 +72,57 @@ void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
     if(WiFi.scanComplete() == -1) {
         clearMetaLogicUpdateTime();
         if(scanProgressDisplay <= 100) {
-            activeDisplay->drawProgress(scanningText, scanProgressDisplay, 0, 0, dispWidth, fontHeight);
+            activeDisplay->drawProgress(scanningText + String(currentChannel), scanProgressDisplay, 0, 0, dispWidth - 12, fontHeight);
             activeDisplay->write();
             scanProgressDisplay += 1;
         }
     }
-    else {
+    else if (WiFi.scanComplete() >= 0){
+        currentChannel += 1;
+        if(SERIAL_DEBUG) {
+            Serial.println("Current channel: " + String(currentChannel));
+        }
+        if(currentChannel > nChannels) {
+            currentChannel = 1;
+            scannedAllChannels = true;
+            displayLineVector.clear();
+            rebuildNetworkInformation = false;
+            for(int i = 0; i < netLineVector.size(); i++) {
+                if(SERIAL_DEBUG) {
+                    Serial.println("Transferring network from netline to displayline vector");
+                    Serial.flush();
+                }
+                displayLineVector.addToBuffer(std::move(netLineVector.at(i)));
+            }
+            if(SERIAL_DEBUG) {
+                Serial.println("Clearing the old buffer of networks");
+                Serial.flush();
+                Serial.println("Length of netline: " + String(netLineVector.size()));
+                Serial.println("Length of displayline: " + String(displayLineVector.size()));
+            }
+            // This buffer is using unique pointers, so no need to free them before clearing
+            netLineVector.clear();
+            WiFi.scanDelete();
+        }
+        readLastScan = true;
         if(rebuildNetworkInformation) {
             availableNetworks = WiFi.scanComplete();
             buildNetworkInformation();
             rebuildNetworkInformation = false;
-            activeDisplay->clear(0, 0, dispWidth, fontHeight);
-            activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, 0);
-            activeDisplay->write();
         }
     }
 }
 
 void FrequencyAnalysisDisplayModule::displayUpdate(int64_t lastMetaDisplayUpdate)
 {        
-    if(availableNetworks <= 0) {
+    if(displayLineVector.empty()) {
         return;
     }
 
     yOffset = 0;
     activeDisplay->clearDisplayBuffer();
     if(!rebuildNetworkInformation) {
-        activeDisplay->writeTextToScreen("Networks in range: " + String(availableNetworks), 0, 0);
+        activeDisplay->writeTextToScreen("Networks in range: " + String(displayLineVector.size()), 0, 0);
         activeDisplay->write();
     }
 
@@ -106,7 +133,7 @@ void FrequencyAnalysisDisplayModule::displayUpdate(int64_t lastMetaDisplayUpdate
             }
             yOffset += activeDisplay->getFontOffsetCharHeight(); // leave space for text covered in logic update
             printNetworkInformation(yOffset, dispWidth, fontHeight);
-            netLineVector.shiftForward();
+            displayLineVector.shiftForward();
             break;
         case sigGraph:
             break;
@@ -121,16 +148,9 @@ bool wifiNetworkCompare(std::shared_ptr<WifiNetwork> one, std::shared_ptr<WifiNe
 }
 
 void FrequencyAnalysisDisplayModule::buildNetworkInformation() {
-    if(SERIAL_DEBUG) {
-        Serial.println("Clearing the old buffer of networks");
-        Serial.flush();
-    }
-
-    // This buffer is using unique pointers, so no need to free them before clearing
-    netLineVector.getBuffer().clear();
 
     if(SERIAL_DEBUG) {
-        Serial.println("Building new buffer of networks");
+        Serial.println("adding to the buffer of networks");
         Serial.flush();
     }
     // check that all discovered networks are tracked in the netLineVector
@@ -148,13 +168,13 @@ void FrequencyAnalysisDisplayModule::buildNetworkInformation() {
     }
 
     if(SERIAL_DEBUG) {
-        Serial.println("FA: built a new list containing nNetworks: " + String(netLineVector.size()));
+        Serial.println("FA: current network standing:: nNetworks: " + String(netLineVector.size()));
         Serial.println("FA: sorting networks by signal strength");
         Serial.flush();
     }
     // last step is to sort the vector so that the networks with the greatest
     // signal strength bubble to the top
-    netLineVector.getBuffer().sort(wifiNetworkCompare);
+    netLineVector.sort(wifiNetworkCompare);
 }
 
 void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset, int dispWidth, int fontHeight) {
@@ -171,7 +191,7 @@ void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset, int di
     }
     std::shared_ptr<WifiNetwork> wn;
     for(int i = 0; i < netLineVector.size(); i++) {
-        wn = netLineVector.at(i);
+        wn = std::shared_ptr<WifiNetwork>(netLineVector.at(i));
         if(SERIAL_DEBUG) {
             Serial.println("FA-Printing: " + wn->bssid);
             Serial.flush();

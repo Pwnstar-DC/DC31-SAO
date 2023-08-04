@@ -6,10 +6,12 @@
 #include <Arduino.h>
 
 template <typename T> class ScrollingBuffer {
-private:
-    std::list<T> buffer;
+
+typedef bool (*comp_func)(T one, T other);
 
 public:
+
+    std::list<T> buffer;
     
     ScrollingBuffer() {
     }
@@ -53,8 +55,16 @@ public:
         return buffer;
     }
 
+    void sort(comp_func func) {
+        buffer.sort(func);
+    }
+
     bool empty() {
         return buffer.empty();
+    }
+
+    void clear() {
+        buffer.clear();
     }
     
 };
