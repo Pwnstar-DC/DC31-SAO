@@ -92,6 +92,7 @@ void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
                     Serial.println("Transferring network from netline to displayline vector");
                     Serial.flush();
                 }
+                // release the items from netLineVector into displayLineVector to prevent auto-freeing
                 displayLineVector.addToBuffer(std::move(netLineVector.at(i)));
             }
             if(SERIAL_DEBUG) {
@@ -190,8 +191,8 @@ void FrequencyAnalysisDisplayModule::printNetworkInformation(int yOffset, int di
         Serial.flush();
     }
     std::shared_ptr<WifiNetwork> wn;
-    for(int i = 0; i < netLineVector.size(); i++) {
-        wn = std::shared_ptr<WifiNetwork>(netLineVector.at(i));
+    for(int i = 0; i <  displayLineVector.size(); i++) {
+        wn = std::shared_ptr<WifiNetwork>(displayLineVector.at(i));
         if(SERIAL_DEBUG) {
             Serial.println("FA-Printing: " + wn->bssid);
             Serial.flush();
