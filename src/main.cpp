@@ -147,10 +147,10 @@ void registerPinActions() {
 
       // rotate module pin
       pinMode(D8, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D8), activeModuleModeCycle, RISING); // rising to activate when button released
+      attachInterrupt(digitalPinToInterrupt(D8), activeModuleCycle, RISING); // rising to activate when button released
       // module mode cycle pin
       pinMode(D9, INPUT_PULLUP); // use input_pullup for activate on ground
-      attachInterrupt(digitalPinToInterrupt(D9), activeModuleCycle, RISING); // rising to activate when button released
+      attachInterrupt(digitalPinToInterrupt(D9), activeModuleModeCycle, RISING); // rising to activate when button released
       
     #endif
   #endif
