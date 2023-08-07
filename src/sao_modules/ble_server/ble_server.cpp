@@ -21,6 +21,9 @@ void BLEServerModule::displaySplashScreen() {
 
 void BLEServerModule::setup()
 {
+  if(SERIAL_DEBUG) {
+    Serial.println("Reached BLE Setup");
+  }
   setCpuFrequencyMhz(80); // minimum required to operate this module
   delay(25);
   gif_bitmap = lookaround_bm;
@@ -30,10 +33,9 @@ void BLEServerModule::setup()
   
   activeDisplay->flush();
 
-  Serial.println("Reached BLE Setup");
   BLEDevice::init("ESP32-BLE-Server");
+  BLEDevice::setPower(ESP_PWR_LVL_N18); // ref esp_bt., corresponds to power level -18
   pServer = BLEDevice::createServer();
-
   pService = pServer->createService(SERVICE_UUID);
 
    pCharacteristic = pService->createCharacteristic(
@@ -47,16 +49,22 @@ void BLEServerModule::setup()
 
 	pAdvertising = pServer->getAdvertising();
 	pAdvertising->start();
-
+  if(SERIAL_DEBUG) {
+    Serial.println("BLE setup done");
+  }
 }
 
 void BLEServerModule::teardown() {
+  if(SERIAL_DEBUG) {
+    Serial.println("Tearing down BLE module");
+  }
   pService->stop();
   pAdvertising->stop();
   // power saving features
-  btStop();
-  esp_bt_controller_disable();
   setCpuFrequencyMhz(getXtalFrequencyMhz()); // reset to minimum required to operate controller
+  if(SERIAL_DEBUG) {
+    Serial.println("BLE module teardown complete");
+  }
 }
 
 void BLEServerModule::logicUpdate(int64_t lastMetaLogicUpdate) {

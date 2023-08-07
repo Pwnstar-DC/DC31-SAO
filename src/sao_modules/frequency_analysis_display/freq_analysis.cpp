@@ -4,6 +4,9 @@
 #include "freq_analysis.hpp"
 
 void FrequencyAnalysisDisplayModule::setup() {
+    if(SERIAL_DEBUG) {
+        Serial.println("Frequency Module: Setup start");
+    }
     setCpuFrequencyMhz(80); // minimum required to operate this module
     delay(25);
     esp_wifi_start();
@@ -21,12 +24,17 @@ void FrequencyAnalysisDisplayModule::setup() {
 }
 
 void FrequencyAnalysisDisplayModule::teardown() {
+    if(SERIAL_DEBUG) {
+        Serial.println("Tearing down wifi module");
+    }
     // netLineVector contains unique_ptrs, so no need to free
 
     // power saving features
     esp_wifi_stop();
     setCpuFrequencyMhz(getXtalFrequencyMhz()); // reset mhz to lowest possible
-    return;
+    if(SERIAL_DEBUG) {
+        Serial.println("Wifi module teardown complete");
+    }
 }
 
 void FrequencyAnalysisDisplayModule::draw() 
