@@ -10,6 +10,8 @@
 #define SERIAL_DEBUG 0
 #endif
 
+// a very special message from wolfy
+std::string secretMessage = "00 1000 010 111 101 0 1000 111 1 0000 11 1011 0010 0 0 1 01 10 100 01 0100 0100 00 110 111 1 011 01 000 1 0000 00 000 000 0000 00 1 1 1011 01 100 100 111 10";
 
 //int i = 1;
 int displayWidth = 0;
