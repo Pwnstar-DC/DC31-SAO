@@ -17,4 +17,6 @@ void goToSleep();
 
 void ledToggle();
 
+void flashLeds(bool firstState, int firstStateTime, int secondStateTime);
+
 #endif 
