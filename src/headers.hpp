@@ -19,4 +19,8 @@ void ledToggle();
 
 void flashLeds(bool firstState, int firstStateTime, int secondStateTime);
 
+void flashMessage();
+
+void flashAll(char ch);
+
 #endif 
