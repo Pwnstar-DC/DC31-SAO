@@ -104,6 +104,19 @@ void loop() {
         goToSleep();
       }
       if(checkLed) {
+
+
+        #ifdef BOARD
+          #if BOARD == seed_xiao_esp32c3
+            if(digitalRead(D7) == HIGH) {
+              delay(100);
+              if(digitalRead(D7) == LOW) {
+                flashMessage();
+              }
+            }
+          #endif
+        #endif
+
         ledState += 1;
         if(ledState > 2) {
           ledState = 0;
