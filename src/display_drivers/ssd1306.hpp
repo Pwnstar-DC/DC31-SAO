@@ -98,7 +98,7 @@ public:
         display->mirrorScreen();
     }
 
-        void clear() {
+    void clear() {
         display->clear();
         display->display();
     }

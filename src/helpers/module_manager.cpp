@@ -31,6 +31,8 @@ void ModuleManager::activateModule(int index) {
 }
 
 void ModuleManager::activateModule(ModuleBase * mod) {
+    mod->clearMetaLogicTime();
+    mod->clearMetaDisplayTime();
     mod->displaySplashScreen();
     mod->setup();
     activeModule = mod;
@@ -72,12 +74,25 @@ void ModuleManager::nextModule() {
     if(REGISTERED_MODULES.size() <= 1) {
         return;
     }
+
+    if(SERIAL_DEBUG) {
+        Serial.println("MM - cycling modules");
+        Serial.flush();
+    }
     
     // deactivate current module
     if(activeModule) {
+        if(SERIAL_DEBUG) {
+            Serial.println("MM - deactivating module: " + activeModule->getName());
+            Serial.flush();
+        }
         activeModule->deactivate();
         if(activeModule->activeDisplay) {
             activeModule->activeDisplay->flush();
+        }
+        if(SERIAL_DEBUG) {
+            Serial.println("MM - deactivated module: " + activeModule->getName());
+            Serial.flush();
         }
     }
 
@@ -96,10 +111,23 @@ void ModuleManager::nextModule() {
     }
 
     if(nextModule) {
+        if(SERIAL_DEBUG) {
+            Serial.println("MM - activating module: " + nextModule->getName());
+            Serial.flush();
+        }
         activateModule(nextModule);
     }
     else{
+        if(SERIAL_DEBUG) {
+            Serial.println("MM - activating module: " + REGISTERED_MODULES.at(0)->getName());
+            Serial.flush();
+        }
         activateModule(REGISTERED_MODULES.at(0));
+    }
+
+    if(SERIAL_DEBUG) {
+        Serial.println("MM - activated module: " + activeModule->getName());
+        Serial.flush();
     }
 }
 

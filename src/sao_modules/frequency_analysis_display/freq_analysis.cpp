@@ -6,6 +6,7 @@
 void FrequencyAnalysisDisplayModule::setup() {
     if(SERIAL_DEBUG) {
         Serial.println("Frequency Module: Setup start");
+        Serial.flush();
     }
     setCpuFrequencyMhz(80); // minimum required to operate this module
     delay(25);
@@ -19,22 +20,30 @@ void FrequencyAnalysisDisplayModule::setup() {
     delay(100);
     if(SERIAL_DEBUG) {
         Serial.println("Frequency Module: Setup done");
+        Serial.flush();
     }
     activeDisplay->flush();
+    netLineVector.clear();
+    displayLineVector.clear();
+    firstScanComplete = false;
+    rebuildNetworkInformation = true;
+    readLastScan = false;
+    currentChannel = 1;
 }
 
 void FrequencyAnalysisDisplayModule::teardown() {
     if(SERIAL_DEBUG) {
         Serial.println("Tearing down wifi module");
+        Serial.flush();
     }
-    // netLineVector contains unique_ptrs, so no need to free
 
     // power saving features
     esp_wifi_stop();
     setCpuFrequencyMhz(getXtalFrequencyMhz()); // reset mhz to lowest possible
     if(SERIAL_DEBUG) {
         Serial.println("Wifi module teardown complete");
-    }
+        Serial.flush();
+    }    
 }
 
 void FrequencyAnalysisDisplayModule::draw() 
@@ -60,10 +69,9 @@ void FrequencyAnalysisDisplayModule::displaySplashScreen() {
         activeDisplay->getWidth()
     );
     activeDisplay->flush();
-    delay(2000);
 }
 
-void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
+void FrequencyAnalysisDisplayModule::logicUpdate(uint32_t lastMetaLogicUpdate) {
     if(lastMetaLogicUpdate == 0 || (!scannedAllChannels && readLastScan)) {
         scannedAllChannels = false;
         rebuildNetworkInformation = true;
@@ -78,7 +86,7 @@ void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
     }
 
     if(WiFi.scanComplete() == -1) {
-        clearMetaLogicUpdateTime();
+        resetMetaLogicUpdateTime();
         if(scanProgressDisplay <= 100) {
             activeDisplay->drawProgress(scanningText + String(currentChannel), scanProgressDisplay, 0, 0, dispWidth - 12, fontHeight);
             activeDisplay->write();
@@ -94,6 +102,7 @@ void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
             currentChannel = 1;
             scannedAllChannels = true;
             displayLineVector.clear();
+            firstScanComplete = true;
             rebuildNetworkInformation = false;
             for(int i = 0; i < netLineVector.size(); i++) {
                 if(SERIAL_DEBUG) {
@@ -122,16 +131,16 @@ void FrequencyAnalysisDisplayModule::logicUpdate(int64_t lastMetaLogicUpdate) {
     }
 }
 
-void FrequencyAnalysisDisplayModule::displayUpdate(int64_t lastMetaDisplayUpdate)
+void FrequencyAnalysisDisplayModule::displayUpdate(uint32_t lastMetaDisplayUpdate)
 {        
-    if(displayLineVector.empty()) {
+    if(displayLineVector.empty() || !firstScanComplete) {
         return;
     }
 
     yOffset = 0;
     activeDisplay->clearDisplayBuffer();
     if(!rebuildNetworkInformation) {
-        activeDisplay->writeTextToScreen("Networks in range: " + String(displayLineVector.size()), 0, 0);
+        activeDisplay->writeTextToScreen("2.4g nets in range: " + String(displayLineVector.size()), 0, 0);
         activeDisplay->write();
     }
 

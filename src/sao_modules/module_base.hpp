@@ -15,17 +15,18 @@ private:
     bool isActive = false;
     bool isSessionPersistent = false;
     bool previouslyActive = false;
-    int64_t lastDisplayRefresh = 0;
-    int64_t lastLogicRefresh = 0;
-    int64_t lastMetaDisplayUpdate = 0;
-    int64_t lastMetaLogicUpdate = 0;
-    int metaDisplayUpdateTime = 10000;
-    int metaLogicUpdateTime = 10000;
-    int displayRefreshTime = 250;
-    int logicRefreshTime = 10000;
+    uint32_t lastDisplayRefresh = 0;
+    uint32_t lastLogicRefresh = 0;
+    uint32_t lastMetaDisplayUpdate = 0;
+    uint32_t lastMetaLogicUpdate = 0;
+    uint32_t metaDisplayUpdateTime = 10000;
+    uint32_t metaLogicUpdateTime = 10000;
+    uint32_t displayRefreshTime = 250;
+    uint32_t logicRefreshTime = 10000;
     int lineSpaceOffset = 0.5;
     bool logicUpdateSinceLastDisplayUpdate = false;
     String moduleName = "";
+    bool firstLoop = true; // stooopid edge case fix
 
     // public members
 public:
@@ -38,8 +39,8 @@ public:
     }
 
     virtual void setup() {};
-    virtual void displayUpdate(int64_t timeSinceLastMetaDisplayUpdate) {};
-    virtual void logicUpdate(int64_t timeSinceLastMetaLogicUpdate) {};
+    virtual void displayUpdate(uint32_t timeSinceLastMetaDisplayUpdate) {};
+    virtual void logicUpdate(uint32_t timeSinceLastMetaLogicUpdate) {};
     virtual void teardown() {}
     virtual bool getIsSessionPersistent() {
         return isSessionPersistent;
@@ -57,11 +58,12 @@ public:
 
     virtual void waitForSync() {
 
-        int64_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        uint32_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
         if(now > (lastLogicRefresh + logicRefreshTime)) {
-            if(now > (lastMetaLogicUpdate + metaLogicUpdateTime)) {
+            if(now > (lastMetaLogicUpdate + metaLogicUpdateTime) || firstLoop) {
                 lastMetaLogicUpdate = now;
+                firstLoop = false; // thanks kevin -- pwnstar
             }
 
             logicUpdate(now - lastMetaLogicUpdate);
@@ -116,13 +118,19 @@ public:
         }
     }
 
-    void clearMetaLogicUpdateTime() {
+    void resetMetaLogicUpdateTime() {
         lastMetaLogicUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
     }
-    void clearMetaDisplayUpdateTime() {
+    void resetMetaDisplayUpdateTime() {
         lastMetaDisplayUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
     }
 
+    void clearMetaLogicTime() {
+        metaLogicUpdateTime = 0;
+    }
+    void clearMetaDisplayTime() {
+        metaDisplayUpdateTime = 0;
+    }
 };
 
 

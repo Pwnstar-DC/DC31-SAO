@@ -67,7 +67,7 @@ void BLEServerModule::teardown() {
   }
 }
 
-void BLEServerModule::logicUpdate(int64_t lastMetaLogicUpdate) {
+void BLEServerModule::logicUpdate(uint32_t lastMetaLogicUpdate) {
   String compare;
   String valtostring;
   valtostring = pCharacteristic->getValue().c_str();
@@ -88,7 +88,7 @@ void BLEServerModule::logicUpdate(int64_t lastMetaLogicUpdate) {
   pCharacteristic->setValue("Hello World");
 }
 
-void BLEServerModule::displayUpdate(int64_t lastMetaDisplayUpdate) {
+void BLEServerModule::displayUpdate(uint32_t lastMetaDisplayUpdate) {
   if(counter == MAX_COUNT) counter = 0;
   activeDisplay->drawBitmap(gif_bitmap[counter]);
   counter++;

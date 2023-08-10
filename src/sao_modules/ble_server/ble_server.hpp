@@ -25,8 +25,8 @@ public:
 
     void printBuffer();
 
-    void logicUpdate(int64_t lastMetaLogicUpdate);
-    void displayUpdate(int64_t lastMetaDisplayUpdate);
+    void logicUpdate(uint32_t lastMetaLogicUpdate);
+    void displayUpdate(uint32_t lastMetaDisplayUpdate);
     void teardown();
     void displaySplashScreen();
 };

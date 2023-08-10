@@ -70,6 +70,7 @@ private:
     int yOffset = 0;
     int nChannels = 14;
     int currentChannel = 1;
+    bool firstScanComplete = false;
 public:
     
 
@@ -90,9 +91,9 @@ public:
 
     void teardown();
 
-    void logicUpdate(int64_t lastMetaLogicUpdate);
+    void logicUpdate(uint32_t lastMetaLogicUpdate);
 
-    void displayUpdate(int64_t lastMetaDisplayUpdate);
+    void displayUpdate(uint32_t lastMetaDisplayUpdate);
 
     void displaySplashScreen();
 

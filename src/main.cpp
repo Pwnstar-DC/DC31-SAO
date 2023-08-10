@@ -20,7 +20,7 @@ bool shiftModes = false;
 bool checkSleep = false;
 bool checkLed = false;
 int ledState = 2;
-int64_t boot_time;
+uint32_t boot_time;
 
 ModuleManager *mm;
 
@@ -80,7 +80,11 @@ void setup() {
 void loop() {
 
   if(shiftModes || shiftModules || checkSleep || checkLed) {
-    int64_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+    if(SERIAL_DEBUG) {
+        Serial.println("Main: Interrupt");
+        Serial.flush();
+    }
+    uint32_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
     // protect the button triggers for 1 second after boot to prevent startup-related rising triggers
     if(now + 1000 > boot_time) {
@@ -138,9 +142,9 @@ void registerPinActions() {
       ledcSetup(0, 10000, 8);
       ledcSetup(1, 10000, 8);
       ledcSetup(2, 10000, 8);
-      ledcAttachPin(GPIO_NUM_2, 0);
-      ledcAttachPin(GPIO_NUM_3, 1);
-      ledcAttachPin(GPIO_NUM_4, 2);
+      ledcAttachPin(A0, 0);
+      ledcAttachPin(A1, 1);
+      ledcAttachPin(A2, 2);
       ledcWrite(0, 128 * ledState);
       ledcWrite(1, 128 * ledState);
       ledcWrite(2, 128 * ledState);
