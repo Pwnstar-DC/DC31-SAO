@@ -51,7 +51,7 @@ void setup() {
   displayHeight = display->getHeight();
   display->writeTextToScreen("initializing...", 0, displayHeight/2);
   display->flush();
-  delay(2000);
+  //delay(2000);
   writeToSerial("Finished initializing display...");
   writeToSerial("Initializing pins...");
   registerPinActions();
@@ -81,10 +81,10 @@ void setup() {
   setCpuFrequencyMhz(getXtalFrequencyMhz());
   boot_time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
   writeToSerial("Setup complete");
+  //flashMessage();
 }
 
 void loop() {
-
   if(shiftModes || shiftModules || checkSleep || checkLed) {
     if(SERIAL_DEBUG) {
         Serial.println("Main: Interrupt");
@@ -186,6 +186,45 @@ void goToSleep() {
   display->setDisplayOff();
   esp_deep_sleep_start();
   display->setDisplayOn();
+}
+
+void flashMessage() {
+  // flash secret message
+  for (char& ch: secretMessage) {
+    flashAll(ch);
+    // pause for a quarter second
+    delay(125);
+  }
+  // set leds back to original state
+  ledcWrite(0, 128 * ledState);
+  ledcWrite(1, 128 * ledState);
+  ledcWrite(2, 128 * ledState);
+}
+
+void flashAll(char ch) {
+  if (ch == '0') {
+    // set all to on for half a second
+    ledcWrite(0, 128);
+    ledcWrite(1, 128);
+    ledcWrite(2, 128);
+    delay(150);
+  } else if (ch == '1') {
+    // set all to on for a full second
+    ledcWrite(0, 128);
+    ledcWrite(1, 128);
+    ledcWrite(2, 128);
+    delay(300);
+  } else {
+    // keep all off for a half second
+    ledcWrite(0, 0);
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
+    delay(150);
+  }
+  // set all to off
+  ledcWrite(0, 0);
+  ledcWrite(1, 0);
+  ledcWrite(2, 0);
 }
 
 void flashLeds(bool firstState, int firstStateTime, int secondStateTime) {
